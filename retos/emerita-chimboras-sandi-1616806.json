@@ -1,0 +1,70 @@
+{
+  "alumno": "Emérita Chimboras Sandi",
+  "codigo": "1616806",
+  "token_entrega": "8D86EF6F17C2",
+  "generado_en_utc": "2026-03-31T16:07:26.310835+00:00",
+  "reglas_entrega": {
+    "rama_git_obligatoria": "alumno/emerita-chimboras-sandi-8d86",
+    "nombre_archivo_reflexion": "REFLEXION_8D86EF6F17C2.md",
+    "incluir_token_en_readme": true,
+    "incluir_token_en_commit_final": true
+  },
+  "parametros_unicos": {
+    "stock_minimo_pelicula": 2,
+    "mora_por_dia_soles": 5,
+    "limite_alquileres_pendientes": 4,
+    "dias_maximo_retraso": 9,
+    "prefijo_slug_obligatorio": "emerit-97"
+  },
+  "retos_asignados": [
+    {
+      "id": 19,
+      "titulo": "Reto Django #19"
+    },
+    {
+      "id": 23,
+      "titulo": "Reto Django #23"
+    },
+    {
+      "id": 29,
+      "titulo": "Reto Django #29"
+    },
+    {
+      "id": 32,
+      "titulo": "Reto Django #32"
+    },
+    {
+      "id": 47,
+      "titulo": "Reto Django #47"
+    },
+    {
+      "id": 50,
+      "titulo": "Reto Django #50"
+    },
+    {
+      "id": 60,
+      "titulo": "Reto Django #60"
+    },
+    {
+      "id": 69,
+      "titulo": "Reto Django #69"
+    },
+    {
+      "id": 71,
+      "titulo": "Reto Django #71"
+    },
+    {
+      "id": 82,
+      "titulo": "Reto Django #82"
+    },
+    {
+      "id": 86,
+      "titulo": "Reto Django #86"
+    },
+    {
+      "id": 89,
+      "titulo": "Reto Django #89"
+    }
+  ],
+  "instruccion_docente": "Pide al alumno que implemente solo estos retos. Si otro repo tiene token o parámetros distintos, se considera copia."
+}

@@ -5,6 +5,10 @@ import datetime
 from django import forms
 
 from .models import Alquiler, Categoria, Cliente, Pelicula
+from django.conf import settings
+
+STOCK_MINIMO_PELICULA = 2
+LIMITE_ALQUILERES_PENDIENTES = 4
 
 
 class CategoriaForm(forms.ModelForm):
@@ -22,13 +26,40 @@ class ClienteForm(forms.ModelForm):
 class PeliculaForm(forms.ModelForm):
     class Meta:
         model = Pelicula
-        fields = ["titulo", "anio", "categoria", "precio_alquiler"]
+        fields = ["titulo", "slug", "anio", "categoria", "precio_alquiler", "stock"]
+
+    def clean_slug(self):
+        slug = self.cleaned_data["slug"]
+        if slug and not slug.startswith("emerit-97"):
+            raise forms.ValidationError("El slug debe comenzar con el prefijo obligatorio 'emerit-97'.")
+        return slug
 
 
 class AlquilerCreateForm(forms.ModelForm):
     class Meta:
         model = Alquiler
         fields = ["cliente", "pelicula"]
+
+    def clean(self):
+        cleaned = super().clean()
+        cliente = cleaned.get("cliente")
+        pelicula = cleaned.get("pelicula")
+
+        if not cliente or not pelicula:
+            return cleaned
+
+        if pelicula.stock < STOCK_MINIMO_PELICULA:
+            raise forms.ValidationError(
+                f"No se puede alquilar esta película porque el stock debe ser al menos {STOCK_MINIMO_PELICULA}."
+            )
+
+        pendientes = Alquiler.objects.filter(cliente=cliente, pagado=False).count()
+        if pendientes >= LIMITE_ALQUILERES_PENDIENTES:
+            raise forms.ValidationError(
+                f"El cliente ya alcanzó el límite de {LIMITE_ALQUILERES_PENDIENTES} alquileres pendientes."
+            )
+
+        return cleaned
 
 
 class MarcarPagadoForm(forms.Form):
@@ -52,11 +83,9 @@ class SimularVentasForm(forms.Form):
         if desde and hasta and desde > hasta:
             raise forms.ValidationError("La fecha 'Desde' no puede ser posterior a 'Hasta'.")
 
-        # Si no se manda rango, usaremos la fecha de hoy.
         if not desde and not hasta:
             today = datetime.date.today()
             cleaned["desde"] = today
             cleaned["hasta"] = today
 
         return cleaned
-

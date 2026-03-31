@@ -1,7 +1,8 @@
 import datetime
 import random
 
-from django.db.models import Sum
+from django.db import transaction
+from django.db.models import F, Sum
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
@@ -10,6 +11,7 @@ from django.views import View
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 
 from .forms import AlquilerCreateForm, MarcarPagadoForm, SimularVentasForm
+from .mixins import VistaPrivadaMixin
 from .models import Alquiler, Categoria, Cliente, Pelicula
 
 
@@ -36,21 +38,13 @@ def index(request: HttpRequest) -> HttpResponse:
     )
 
 
-class CategoriaListView(ListView):
+class CategoriaListView(VistaPrivadaMixin, ListView):
     model = Categoria
     template_name = "tienda/categoria_list.html"
     context_object_name = "categorias"
 
 
-class CategoriaCreateView(CreateView):
-    model = Categoria
-    form_class = None  # se usa el form del modelo con campos del template
-    fields = ["nombre", "descripcion"]
-    template_name = "tienda/categoria_form.html"
-    success_url = reverse_lazy("categoria_list")
-
-
-class CategoriaUpdateView(UpdateView):
+class CategoriaCreateView(VistaPrivadaMixin, CreateView):
     model = Categoria
     form_class = None
     fields = ["nombre", "descripcion"]
@@ -58,72 +52,100 @@ class CategoriaUpdateView(UpdateView):
     success_url = reverse_lazy("categoria_list")
 
 
-class CategoriaDeleteView(DeleteView):
+class CategoriaUpdateView(VistaPrivadaMixin, UpdateView):
+    model = Categoria
+    form_class = None
+    fields = ["nombre", "descripcion"]
+    template_name = "tienda/categoria_form.html"
+    success_url = reverse_lazy("categoria_list")
+
+
+class CategoriaDeleteView(VistaPrivadaMixin, DeleteView):
     model = Categoria
     template_name = "tienda/categoria_confirm_delete.html"
     success_url = reverse_lazy("categoria_list")
 
 
-class ClienteListView(ListView):
+class ClienteListView(VistaPrivadaMixin, ListView):
     model = Cliente
     template_name = "tienda/cliente_list.html"
     context_object_name = "clientes"
 
 
-class ClienteCreateView(CreateView):
+class ClienteCreateView(VistaPrivadaMixin, CreateView):
     model = Cliente
     fields = ["nombre", "email", "telefono"]
     template_name = "tienda/cliente_form.html"
     success_url = reverse_lazy("cliente_list")
 
 
-class ClienteUpdateView(UpdateView):
+class ClienteUpdateView(VistaPrivadaMixin, UpdateView):
     model = Cliente
     fields = ["nombre", "email", "telefono"]
     template_name = "tienda/cliente_form.html"
     success_url = reverse_lazy("cliente_list")
 
 
-class ClienteDeleteView(DeleteView):
+class ClienteDeleteView(VistaPrivadaMixin, DeleteView):
     model = Cliente
     template_name = "tienda/cliente_confirm_delete.html"
     success_url = reverse_lazy("cliente_list")
 
 
-class PeliculaListView(ListView):
+class PeliculaListView(VistaPrivadaMixin, ListView):
     model = Pelicula
     template_name = "tienda/pelicula_list.html"
     context_object_name = "peliculas"
 
+    def get_queryset(self):
+        return super().get_queryset().select_related("categoria")
 
-class PeliculaCreateView(CreateView):
+
+class PeliculaCreateView(VistaPrivadaMixin, CreateView):
     model = Pelicula
-    fields = ["titulo", "anio", "categoria", "precio_alquiler"]
+    fields = ["titulo", "slug", "anio", "categoria", "precio_alquiler", "stock"]
     template_name = "tienda/pelicula_form.html"
     success_url = reverse_lazy("pelicula_list")
 
 
-class PeliculaUpdateView(UpdateView):
+class PeliculaUpdateView(VistaPrivadaMixin, UpdateView):
     model = Pelicula
-    fields = ["titulo", "anio", "categoria", "precio_alquiler"]
+    fields = ["titulo", "slug", "anio", "categoria", "precio_alquiler", "stock"]
     template_name = "tienda/pelicula_form.html"
     success_url = reverse_lazy("pelicula_list")
 
 
-class PeliculaDeleteView(DeleteView):
+class PeliculaDeleteView(VistaPrivadaMixin, DeleteView):
     model = Pelicula
     template_name = "tienda/pelicula_confirm_delete.html"
     success_url = reverse_lazy("pelicula_list")
 
 
-class AlquilerCreateView(CreateView):
+class AlquilerCreateView(VistaPrivadaMixin, CreateView):
     model = Alquiler
     form_class = AlquilerCreateForm
     template_name = "tienda/alquiler_form.html"
     success_url = reverse_lazy("alquiler_list")
 
+    def form_valid(self, form):
+        with transaction.atomic():
+            pelicula = Pelicula.objects.select_for_update().get(pk=form.cleaned_data["pelicula"].pk)
 
-class AlquilerListView(ListView):
+            if pelicula.stock < 2:
+                form.add_error("pelicula", "No hay stock suficiente para alquilar esta película.")
+                return self.form_invalid(form)
+
+            self.object = form.save(commit=False)
+            self.object.precio = pelicula.precio_alquiler
+            self.object.save()
+
+            pelicula.stock = F("stock") - 1
+            pelicula.save(update_fields=["stock"])
+
+        return redirect(self.get_success_url())
+
+
+class AlquilerListView(VistaPrivadaMixin, ListView):
     model = Alquiler
     template_name = "tienda/alquiler_list.html"
     context_object_name = "alquileres"
@@ -139,7 +161,7 @@ class AlquilerListView(ListView):
         return qs
 
 
-class MarcarPagadoView(View):
+class MarcarPagadoView(VistaPrivadaMixin, View):
     template_name = "tienda/marcar_pagado.html"
 
     def get(self, request: HttpRequest, pk: int) -> HttpResponse:
@@ -156,7 +178,7 @@ class MarcarPagadoView(View):
         return render(request, self.template_name, {"alquiler": alquiler, "form": form})
 
 
-class VentasListView(ListView):
+class VentasListView(VistaPrivadaMixin, ListView):
     model = Alquiler
     template_name = "tienda/ventas_list.html"
     context_object_name = "ventas"
@@ -192,7 +214,6 @@ def simular_ventas(request: HttpRequest) -> HttpResponse:
                     {"form": form, "error": "Necesitas al menos 1 cliente y 1 película para simular."},
                 )
 
-            # Generamos fechas aleatorias en el rango.
             alquileres_creados = 0
             delta_dias = (hasta - desde).days if hasta >= desde else 0
 
@@ -202,9 +223,8 @@ def simular_ventas(request: HttpRequest) -> HttpResponse:
 
                 offset = random.randint(0, max(delta_dias, 0))
                 fecha_alquiler = desde + datetime.timedelta(days=offset)
-
-                # En esta versión simple, una "venta" es un alquiler marcado como pagado.
                 fecha_devolucion = fecha_alquiler + datetime.timedelta(days=random.randint(0, 7))
+
                 Alquiler.objects.create(
                     cliente=cliente,
                     pelicula=pelicula,
@@ -225,4 +245,3 @@ def simular_ventas(request: HttpRequest) -> HttpResponse:
         )
 
     return render(request, "tienda/simular_ventas.html", {"form": form})
-

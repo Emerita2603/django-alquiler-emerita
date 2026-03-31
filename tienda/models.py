@@ -3,6 +3,7 @@ from decimal import Decimal
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.utils import timezone
+from django.utils.text import slugify
 
 
 class Categoria(models.Model):
@@ -30,9 +31,22 @@ class Cliente(models.Model):
 
 class Pelicula(models.Model):
     titulo = models.CharField(max_length=200)
-    anio = models.PositiveIntegerField(validators=[MinValueValidator(1900)], verbose_name="Año")
-    categoria = models.ForeignKey(Categoria, on_delete=models.PROTECT, related_name="peliculas")
-    precio_alquiler = models.DecimalField(max_digits=8, decimal_places=2, validators=[MinValueValidator(Decimal("0"))])
+    slug = models.SlugField(max_length=255, unique=True, blank=True)
+    anio = models.PositiveIntegerField(
+        validators=[MinValueValidator(1900)],
+        verbose_name="Año",
+    )
+    categoria = models.ForeignKey(
+        Categoria,
+        on_delete=models.PROTECT,
+        related_name="peliculas",
+    )
+    precio_alquiler = models.DecimalField(
+        max_digits=8,
+        decimal_places=2,
+        validators=[MinValueValidator(Decimal("0"))],
+    )
+    stock = models.PositiveIntegerField(default=2)
 
     class Meta:
         ordering = ["titulo", "anio"]
@@ -41,17 +55,20 @@ class Pelicula(models.Model):
     def __str__(self) -> str:
         return f"{self.titulo} ({self.anio})"
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            base_slug = slugify(self.titulo)
+            self.slug = f"emerit-97-{base_slug}"
+        super().save(*args, **kwargs)
+
 
 class Alquiler(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name="alquileres")
     pelicula = models.ForeignKey(Pelicula, on_delete=models.PROTECT, related_name="alquileres")
 
-    # Usamos default para que la simulación pueda fijar fechas explícitas.
     fecha_alquiler = models.DateField(default=timezone.localdate)
     fecha_devolucion = models.DateField(blank=True, null=True)
     pagado = models.BooleanField(default=False)
-
-    # Guardamos el precio en el momento del alquiler para que no cambie si cambia la película.
     precio = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
 
     class Meta:
@@ -61,9 +78,6 @@ class Alquiler(models.Model):
         return f"Alquiler: {self.pelicula} - {self.cliente}"
 
     def marcar_pagado(self, fecha_devolucion=None) -> None:
-        """
-        Marca el alquiler como pagado y (opcionalmente) registra la devolución.
-        """
         if fecha_devolucion is None:
             fecha_devolucion = timezone.localdate()
 
