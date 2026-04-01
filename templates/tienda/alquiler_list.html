@@ -1,22 +1,25 @@
 {% extends "base.html" %}
 {% load soles %}
 
-{% block title %}Alquileres{% endblock %}
+{% block title %}Alquileres - Alquiler de Películas{% endblock %}
 
 {% block content %}
     <div class="card">
         <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap">
             <h2 style="margin: 0">Alquileres</h2>
+
+            {% if perms.tienda.add_alquiler %}
             <a class="btn" href="{% url 'alquiler_create' %}">Nuevo alquiler</a>
+            {% endif %}
         </div>
 
-        <div style="margin-top: 12px; margin-bottom: 12px">
-            <a class="btn secondary" href="{% url 'alquiler_list' %}">Todos</a>
-            <a class="btn secondary" href="{% url 'alquiler_list' %}?pagado=0">Pendientes</a>
-            <a class="btn secondary" href="{% url 'alquiler_list' %}?pagado=1">Pagados</a>
-        </div>
+        <div style="margin-top: 12px">
+            <div style="margin-bottom: 10px;">
+                <a class="btn secondary" href="{% url 'alquiler_list' %}">Todos</a>
+                <a class="btn secondary" href="{% url 'alquiler_list' %}?pagado=0">Pendientes</a>
+                <a class="btn secondary" href="{% url 'alquiler_list' %}?pagado=1">Pagados</a>
+            </div>
 
-        <div>
             <table>
                 <thead>
                     <tr>
@@ -25,8 +28,9 @@
                         <th>Película</th>
                         <th>Categoría</th>
                         <th>Precio</th>
+                        <th>Mora</th> <!-- 🔥 NUEVO -->
                         <th>Estado</th>
-                        <th style="width: 220px">Acciones</th>
+                        <th>Acciones</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -34,22 +38,28 @@
                         <tr>
                             <td>{{ alquiler.fecha_alquiler }}</td>
                             <td>{{ alquiler.cliente.nombre }}</td>
-                            <td>
-                                {{ alquiler.pelicula.titulo }} ({{ alquiler.pelicula.anio }})
-                            </td>
+                            <td>{{ alquiler.pelicula.titulo }}</td>
                             <td>{{ alquiler.pelicula.categoria.nombre }}</td>
+
                             <td>{{ alquiler.precio|soles }}</td>
+
+                            <!-- 🔥 MORA -->
+                            <td>S/ {{ alquiler.calcular_mora }}</td>
+
                             <td>
                                 {% if alquiler.pagado %}
-                                    <b style="color: #16a34a">Pagado</b>
-                                    {% if alquiler.fecha_devolucion %}<div class="help">Devuelto: {{ alquiler.fecha_devolucion }}</div>{% endif %}
+                                    <span style="color: green; font-weight: bold;">Pagado</span><br>
+                                    <small>Devuelto: {{ alquiler.fecha_devolucion }}</small>
                                 {% else %}
-                                    <b style="color: #f59e0b">Pendiente</b>
+                                    <span style="color: orange; font-weight: bold;">Pendiente</span>
                                 {% endif %}
                             </td>
+
                             <td class="actions">
-                                {% if not alquiler.pagado %}
-                                    <a class="btn" href="{% url 'alquiler_marcar_pagado' alquiler.pk %}">Marcar pagado</a>
+                                {% if not alquiler.pagado and perms.tienda.change_alquiler %}
+                                <a class="btn" href="{% url 'alquiler_marcar_pagado' alquiler.pk %}">
+                                    Marcar pagado
+                                </a>
                                 {% else %}
                                     <span class="help">Ya cuenta como venta</span>
                                 {% endif %}
@@ -57,28 +67,11 @@
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="7" class="help">No hay alquileres para mostrar.</td>
+                            <td colspan="8" class="help">No hay alquileres para mostrar.</td>
                         </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-
-        {% if is_paginated %}
-            <div style="margin-top: 14px">
-                <div style="display: flex; gap: 10px; flex-wrap: wrap; align-items: center">
-                    {% if page_obj.has_previous %}
-                        <a class="btn secondary" href="?page={{ page_obj.previous_page_number }}{% if request.GET.pagado %}&pagado={{ request.GET.pagado }}{% endif %}">Anterior</a>
-                    {% endif %}
-                    <div class="help">
-                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
-                    </div>
-                    {% if page_obj.has_next %}
-                        <a class="btn secondary" href="?page={{ page_obj.next_page_number }}{% if request.GET.pagado %}&pagado={{ request.GET.pagado }}{% endif %}">Siguiente</a>
-                    {% endif %}
-                </div>
-            </div>
-        {% endif %}
     </div>
 {% endblock %}
-

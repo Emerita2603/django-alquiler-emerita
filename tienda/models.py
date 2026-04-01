@@ -86,6 +86,19 @@ class Alquiler(models.Model):
         self.fecha_devolucion = fecha_devolucion
         self.save(update_fields=["pagado", "fecha_devolucion"])
 
+    # 🔥 NUEVO MÉTODO (RETO 60)
+    def calcular_mora(self):
+        if not self.fecha_devolucion:
+            return 0
+
+        dias_retraso = (self.fecha_devolucion - self.fecha_alquiler).days
+
+        if dias_retraso <= 0:
+            return 0
+
+        dias_cobrables = min(dias_retraso, 9)  # máximo 9 días
+        return dias_cobrables * 5  # S/ 5 por día
+
     def save(self, *args, **kwargs):
         if self.precio is None:
             self.precio = self.pelicula.precio_alquiler
