@@ -43,6 +43,9 @@ class CategoriaListView(VistaPrivadaMixin, ListView):
     template_name = "tienda/categoria_list.html"
     context_object_name = "categorias"
 
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related("peliculas")
+
 
 class CategoriaCreateView(VistaConPermisoMixin, CreateView):
     permission_required = "tienda.add_categoria"
@@ -71,6 +74,9 @@ class ClienteListView(VistaPrivadaMixin, ListView):
     model = Cliente
     template_name = "tienda/cliente_list.html"
     context_object_name = "clientes"
+
+    def get_queryset(self):
+        return super().get_queryset().prefetch_related("alquileres")
 
 
 class ClienteCreateView(VistaConPermisoMixin, CreateView):
@@ -102,8 +108,7 @@ class PeliculaListView(VistaPrivadaMixin, ListView):
     context_object_name = "peliculas"
 
     def get_queryset(self):
-        return super().get_queryset().select_related("categoria")
-
+        return super().get_queryset().select_related("categoria").prefetch_related("alquileres")
 
 class PeliculaCreateView(VistaConPermisoMixin, CreateView):
     permission_required = "tienda.add_pelicula"
