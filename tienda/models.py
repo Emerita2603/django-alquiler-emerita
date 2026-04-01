@@ -32,6 +32,7 @@ class Cliente(models.Model):
 class Pelicula(models.Model):
     titulo = models.CharField(max_length=200)
     slug = models.SlugField(max_length=255, unique=True, blank=True)
+    descripcion = models.TextField(blank=True)
     anio = models.PositiveIntegerField(
         validators=[MinValueValidator(1900)],
         verbose_name="Año",

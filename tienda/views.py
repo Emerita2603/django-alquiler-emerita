@@ -10,7 +10,7 @@ from django.utils import timezone
 from django.views import View
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 
-from .forms import AlquilerCreateForm, MarcarPagadoForm, SimularVentasForm
+from .forms import AlquilerCreateForm, MarcarPagadoForm, PeliculaForm, SimularVentasForm
 from .mixins import VistaPrivadaMixin
 from .models import Alquiler, Categoria, Cliente, Pelicula
 
@@ -103,14 +103,14 @@ class PeliculaListView(VistaPrivadaMixin, ListView):
 
 class PeliculaCreateView(VistaPrivadaMixin, CreateView):
     model = Pelicula
-    fields = ["titulo", "slug", "anio", "categoria", "precio_alquiler", "stock"]
+    form_class = PeliculaForm
     template_name = "tienda/pelicula_form.html"
     success_url = reverse_lazy("pelicula_list")
 
 
 class PeliculaUpdateView(VistaPrivadaMixin, UpdateView):
     model = Pelicula
-    fields = ["titulo", "slug", "anio", "categoria", "precio_alquiler", "stock"]
+    form_class = PeliculaForm
     template_name = "tienda/pelicula_form.html"
     success_url = reverse_lazy("pelicula_list")
 

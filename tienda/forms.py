@@ -26,13 +26,21 @@ class ClienteForm(forms.ModelForm):
 class PeliculaForm(forms.ModelForm):
     class Meta:
         model = Pelicula
-        fields = ["titulo", "slug", "anio", "categoria", "precio_alquiler", "stock"]
+        fields = ["titulo", "slug", "descripcion", "anio", "categoria", "precio_alquiler", "stock"]
 
     def clean_slug(self):
         slug = self.cleaned_data["slug"]
         if slug and not slug.startswith("emerit-97"):
             raise forms.ValidationError("El slug debe comenzar con el prefijo obligatorio 'emerit-97'.")
         return slug
+
+    def clean_precio_alquiler(self):
+        precio = self.cleaned_data["precio_alquiler"]
+        if precio < settings.PRECIO_MINIMO_PELICULA:
+            raise forms.ValidationError(
+                f"El precio no puede ser menor a {settings.PRECIO_MINIMO_PELICULA} soles."
+            )
+        return precio
 
 
 class AlquilerCreateForm(forms.ModelForm):
