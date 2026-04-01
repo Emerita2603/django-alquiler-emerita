@@ -10,7 +10,7 @@ from django.utils import timezone
 from django.views import View
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 
-from .forms import AlquilerCreateForm, MarcarPagadoForm, PeliculaForm, SimularVentasForm
+from .forms import AlquilerCreateForm, MarcarPagadoForm, SimularVentasForm
 from .mixins import VistaPrivadaMixin
 from .models import Alquiler, Categoria, Cliente, Pelicula
 
@@ -46,7 +46,6 @@ class CategoriaListView(VistaPrivadaMixin, ListView):
 
 class CategoriaCreateView(VistaPrivadaMixin, CreateView):
     model = Categoria
-    form_class = None
     fields = ["nombre", "descripcion"]
     template_name = "tienda/categoria_form.html"
     success_url = reverse_lazy("categoria_list")
@@ -54,7 +53,6 @@ class CategoriaCreateView(VistaPrivadaMixin, CreateView):
 
 class CategoriaUpdateView(VistaPrivadaMixin, UpdateView):
     model = Categoria
-    form_class = None
     fields = ["nombre", "descripcion"]
     template_name = "tienda/categoria_form.html"
     success_url = reverse_lazy("categoria_list")
@@ -103,14 +101,14 @@ class PeliculaListView(VistaPrivadaMixin, ListView):
 
 class PeliculaCreateView(VistaPrivadaMixin, CreateView):
     model = Pelicula
-    form_class = PeliculaForm
+    fields = ["titulo", "slug", "anio", "categoria", "precio_alquiler", "stock"]
     template_name = "tienda/pelicula_form.html"
     success_url = reverse_lazy("pelicula_list")
 
 
 class PeliculaUpdateView(VistaPrivadaMixin, UpdateView):
     model = Pelicula
-    form_class = PeliculaForm
+    fields = ["titulo", "slug", "anio", "categoria", "precio_alquiler", "stock"]
     template_name = "tienda/pelicula_form.html"
     success_url = reverse_lazy("pelicula_list")
 
@@ -144,6 +142,9 @@ class AlquilerCreateView(VistaPrivadaMixin, CreateView):
 
         return redirect(self.get_success_url())
 
+    def get_success_url(self):
+        return self.request.GET.get("next") or super().get_success_url()
+
 
 class AlquilerListView(VistaPrivadaMixin, ListView):
     model = Alquiler
@@ -174,7 +175,10 @@ class MarcarPagadoView(VistaPrivadaMixin, View):
         form = MarcarPagadoForm(request.POST)
         if form.is_valid():
             alquiler.marcar_pagado(fecha_devolucion=form.cleaned_data.get("fecha_devolucion"))
-            return redirect("alquiler_list")
+
+            next_url = request.GET.get("next")
+            return redirect(next_url or "alquiler_list")
+
         return render(request, self.template_name, {"alquiler": alquiler, "form": form})
 
 
@@ -214,7 +218,6 @@ def simular_ventas(request: HttpRequest) -> HttpResponse:
                     {"form": form, "error": "Necesitas al menos 1 cliente y 1 película para simular."},
                 )
 
-            alquileres_creados = 0
             delta_dias = (hasta - desde).days if hasta >= desde else 0
 
             for _ in range(numero):
@@ -232,9 +235,9 @@ def simular_ventas(request: HttpRequest) -> HttpResponse:
                     pagado=True,
                     fecha_devolucion=fecha_devolucion,
                 )
-                alquileres_creados += 1
 
             return redirect("ventas_list")
+
     else:
         form = SimularVentasForm(
             initial={
