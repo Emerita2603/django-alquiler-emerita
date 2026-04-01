@@ -105,11 +105,26 @@
                 </div>
                 <nav>
                     <a href="{% url 'index' %}">Inicio</a>
+
+                    {% if perms.tienda.view_categoria %}
                     <a href="{% url 'categoria_list' %}">Categorías</a>
+                    {% endif %}
+
+                    {% if perms.tienda.view_pelicula %}
                     <a href="{% url 'pelicula_list' %}">Películas</a>
+                    {% endif %}
+
+                    {% if perms.tienda.view_cliente %}
                     <a href="{% url 'cliente_list' %}">Clientes</a>
+                    {% endif %}
+
+                    {% if perms.tienda.view_alquiler %}
                     <a href="{% url 'alquiler_list' %}">Alquileres</a>
+                    {% endif %}
+
+                    {% if perms.tienda.view_alquiler %}
                     <a href="{% url 'ventas_list' %}">Ventas</a>
+                    {% endif %}
                 </nav>
             </div>
         </header>
@@ -118,4 +133,3 @@
         </div>
     </body>
 </html>
-

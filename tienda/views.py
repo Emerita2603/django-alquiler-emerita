@@ -11,7 +11,7 @@ from django.views import View
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 
 from .forms import AlquilerCreateForm, MarcarPagadoForm, SimularVentasForm
-from .mixins import VistaPrivadaMixin
+from .mixins import VistaConPermisoMixin, VistaPrivadaMixin
 from .models import Alquiler, Categoria, Cliente, Pelicula
 
 
@@ -44,21 +44,24 @@ class CategoriaListView(VistaPrivadaMixin, ListView):
     context_object_name = "categorias"
 
 
-class CategoriaCreateView(VistaPrivadaMixin, CreateView):
+class CategoriaCreateView(VistaConPermisoMixin, CreateView):
+    permission_required = "tienda.add_categoria"
     model = Categoria
     fields = ["nombre", "descripcion"]
     template_name = "tienda/categoria_form.html"
     success_url = reverse_lazy("categoria_list")
 
 
-class CategoriaUpdateView(VistaPrivadaMixin, UpdateView):
+class CategoriaUpdateView(VistaConPermisoMixin, UpdateView):
+    permission_required = "tienda.change_categoria"
     model = Categoria
     fields = ["nombre", "descripcion"]
     template_name = "tienda/categoria_form.html"
     success_url = reverse_lazy("categoria_list")
 
 
-class CategoriaDeleteView(VistaPrivadaMixin, DeleteView):
+class CategoriaDeleteView(VistaConPermisoMixin, DeleteView):
+    permission_required = "tienda.delete_categoria"
     model = Categoria
     template_name = "tienda/categoria_confirm_delete.html"
     success_url = reverse_lazy("categoria_list")
@@ -70,21 +73,24 @@ class ClienteListView(VistaPrivadaMixin, ListView):
     context_object_name = "clientes"
 
 
-class ClienteCreateView(VistaPrivadaMixin, CreateView):
+class ClienteCreateView(VistaConPermisoMixin, CreateView):
+    permission_required = "tienda.add_cliente"
     model = Cliente
     fields = ["nombre", "email", "telefono"]
     template_name = "tienda/cliente_form.html"
     success_url = reverse_lazy("cliente_list")
 
 
-class ClienteUpdateView(VistaPrivadaMixin, UpdateView):
+class ClienteUpdateView(VistaConPermisoMixin, UpdateView):
+    permission_required = "tienda.change_cliente"
     model = Cliente
     fields = ["nombre", "email", "telefono"]
     template_name = "tienda/cliente_form.html"
     success_url = reverse_lazy("cliente_list")
 
 
-class ClienteDeleteView(VistaPrivadaMixin, DeleteView):
+class ClienteDeleteView(VistaConPermisoMixin, DeleteView):
+    permission_required = "tienda.delete_cliente"
     model = Cliente
     template_name = "tienda/cliente_confirm_delete.html"
     success_url = reverse_lazy("cliente_list")
@@ -99,27 +105,31 @@ class PeliculaListView(VistaPrivadaMixin, ListView):
         return super().get_queryset().select_related("categoria")
 
 
-class PeliculaCreateView(VistaPrivadaMixin, CreateView):
+class PeliculaCreateView(VistaConPermisoMixin, CreateView):
+    permission_required = "tienda.add_pelicula"
     model = Pelicula
     fields = ["titulo", "slug", "anio", "categoria", "precio_alquiler", "stock"]
     template_name = "tienda/pelicula_form.html"
     success_url = reverse_lazy("pelicula_list")
 
 
-class PeliculaUpdateView(VistaPrivadaMixin, UpdateView):
+class PeliculaUpdateView(VistaConPermisoMixin, UpdateView):
+    permission_required = "tienda.change_pelicula"
     model = Pelicula
     fields = ["titulo", "slug", "anio", "categoria", "precio_alquiler", "stock"]
     template_name = "tienda/pelicula_form.html"
     success_url = reverse_lazy("pelicula_list")
 
 
-class PeliculaDeleteView(VistaPrivadaMixin, DeleteView):
+class PeliculaDeleteView(VistaConPermisoMixin, DeleteView):
+    permission_required = "tienda.delete_pelicula"
     model = Pelicula
     template_name = "tienda/pelicula_confirm_delete.html"
     success_url = reverse_lazy("pelicula_list")
 
 
-class AlquilerCreateView(VistaPrivadaMixin, CreateView):
+class AlquilerCreateView(VistaConPermisoMixin, CreateView):
+    permission_required = "tienda.add_alquiler"
     model = Alquiler
     form_class = AlquilerCreateForm
     template_name = "tienda/alquiler_form.html"
