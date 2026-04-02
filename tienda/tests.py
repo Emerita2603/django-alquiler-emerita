@@ -1,3 +1,6 @@
+import os
+import json
+from django.core.management import call_command
 import datetime
 from decimal import Decimal
 from types import SimpleNamespace
@@ -206,3 +209,33 @@ class SimularVentasFormTest(TestCase):
         self.assertTrue(form.is_valid())
         self.assertIsNotNone(form.cleaned_data["desde"])
         self.assertIsNotNone(form.cleaned_data["hasta"])
+
+class ComandoGenerarRetoTest(TestCase):
+    def test_generar_reto_personalizado(self):
+        alumno = "Test Alumno"
+        codigo = "TEST123"
+
+        # Ejecutar comando
+        call_command(
+            "generar_reto_personalizado",
+            alumno=alumno,
+            codigo=codigo,
+        )
+
+        # Nombre esperado del archivo
+        archivo = f"retos/test-alumno-{codigo.lower()}.json"
+
+        # Verificar que existe
+        self.assertTrue(os.path.exists(archivo))
+
+        # Leer contenido
+        with open(archivo, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        # Validaciones
+        self.assertEqual(data["alumno"], alumno)
+        self.assertEqual(data["codigo"], codigo)
+        self.assertIn("token_entrega", data)
+
+        # Limpieza (opcional)
+        os.remove(archivo)        
