@@ -129,7 +129,24 @@
             </div>
         </header>
         <div class="container">
-            {% block content %}{% endblock %}
+
+    {% if messages %}
+        <div style="margin-bottom: 16px;">
+            {% for message in messages %}
+                <div style="
+                    padding: 10px;
+                    border-radius: 6px;
+                    margin-bottom: 8px;
+                    background: #fee2e2;
+                    color: #991b1b;
+                ">
+                    {{ message }}
+                </div>
+            {% endfor %}
         </div>
+    {% endif %}
+
+    {% block content %}{% endblock %}
+</div>
     </body>
 </html>

@@ -6,6 +6,7 @@ import random
 from django.contrib import messages
 from django.db import transaction
 from django.db.models import F, Sum
+from django.db.models.deletion import ProtectedError
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
@@ -76,6 +77,14 @@ class CategoriaDeleteView(VistaConPermisoMixin, DeleteView):
     model = Categoria
     template_name = "tienda/categoria_confirm_delete.html"
     success_url = reverse_lazy("categoria_list")
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        try:
+            return super().post(request, *args, **kwargs)
+        except ProtectedError:
+            messages.error(request, "No puedes eliminar esta categoría porque tiene películas asociadas.")
+            return redirect("categoria_list")
 
 
 class ClienteListView(VistaPrivadaMixin, ListView):
@@ -227,6 +236,14 @@ class PeliculaDeleteView(VistaConPermisoMixin, DeleteView):
     model = Pelicula
     template_name = "tienda/pelicula_confirm_delete.html"
     success_url = reverse_lazy("pelicula_list")
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        try:
+            return super().post(request, *args, **kwargs)
+        except ProtectedError:
+            messages.error(request, "No puedes eliminar esta película porque tiene alquileres asociados.")
+            return redirect("pelicula_list")
 
 
 class AlquilerCreateView(VistaConPermisoMixin, CreateView):
