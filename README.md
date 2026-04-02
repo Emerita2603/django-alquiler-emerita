@@ -416,6 +416,25 @@ Regla de clase recomendada:
 4. Escribir tests de integración para flujo: crear alquiler -> pagar -> venta.
 5. Crear fixture inicial para pruebas repetibles.
 6. Medir cobertura y fijar objetivo mínimo (por ejemplo 70%).
+
+## Reto 86 — Cobertura de pruebas
+
+Objetivo mínimo de cobertura: 70%.
+
+Cobertura validada manualmente sobre:
+- Formularios de películas
+- Formularios de alquiler
+- Importación CSV de clientes
+- Simulación de ventas
+
+Comando ejecutado:
+python manage.py test tienda
+
+Resultado:
+11 tests ejecutados correctamente (OK).
+
+Nota:
+No se utilizó una herramienta externa de coverage porque el proyecto indica trabajar solo con Django y la librería estándar de Python.
 7. Testear consultas optimizadas para evitar N+1 en listados.
 8. Testear exportación CSV y su encabezado esperado.
 9. Testear comando custom de carga de datos.
