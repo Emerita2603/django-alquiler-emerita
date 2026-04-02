@@ -1,6 +1,9 @@
+import csv
 import datetime
+import io
 import random
 
+from django.contrib import messages
 from django.db import transaction
 from django.db.models import F, Sum
 from django.http import HttpRequest, HttpResponse
@@ -10,7 +13,12 @@ from django.utils import timezone
 from django.views import View
 from django.views.generic import CreateView, DeleteView, ListView, UpdateView
 
-from .forms import AlquilerCreateForm, MarcarPagadoForm, SimularVentasForm
+from .forms import (
+    AlquilerCreateForm,
+    ImportarClientesCSVForm,
+    MarcarPagadoForm,
+    SimularVentasForm,
+)
 from .mixins import VistaConPermisoMixin, VistaPrivadaMixin
 from .models import Alquiler, Categoria, Cliente, Pelicula
 
@@ -102,6 +110,93 @@ class ClienteDeleteView(VistaConPermisoMixin, DeleteView):
     success_url = reverse_lazy("cliente_list")
 
 
+class ImportarClientesCSVView(VistaConPermisoMixin, View):
+    permission_required = "tienda.add_cliente"
+    template_name = "tienda/importar_clientes.html"
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        form = ImportarClientesCSVForm()
+        return render(request, self.template_name, {"form": form})
+
+    def post(self, request: HttpRequest) -> HttpResponse:
+        form = ImportarClientesCSVForm(request.POST, request.FILES)
+
+        if not form.is_valid():
+            return render(request, self.template_name, {"form": form})
+
+        archivo = form.cleaned_data["archivo"]
+
+        try:
+            contenido = archivo.read().decode("utf-8")
+        except UnicodeDecodeError:
+            form.add_error("archivo", "El archivo debe estar codificado en UTF-8.")
+            return render(request, self.template_name, {"form": form})
+
+        reader = csv.DictReader(io.StringIO(contenido))
+
+        columnas_esperadas = {"nombre", "email", "telefono"}
+        if not reader.fieldnames:
+            form.add_error("archivo", "El CSV está vacío o no tiene encabezados.")
+            return render(request, self.template_name, {"form": form})
+
+        encabezados = {h.strip().lower() for h in reader.fieldnames if h}
+        if not columnas_esperadas.issubset(encabezados):
+            form.add_error(
+                "archivo",
+                "El CSV debe contener las columnas: nombre, email, telefono.",
+            )
+            return render(request, self.template_name, {"form": form})
+
+        creados = 0
+        errores = []
+
+        for numero_fila, fila in enumerate(reader, start=2):
+            nombre = (fila.get("nombre") or "").strip()
+            email = (fila.get("email") or "").strip()
+            telefono = (fila.get("telefono") or "").strip()
+
+            if not nombre and not email and not telefono:
+                continue
+
+            if not nombre:
+                errores.append(f"Fila {numero_fila}: nombre vacío.")
+                continue
+
+            if not email:
+                errores.append(f"Fila {numero_fila}: email vacío.")
+                continue
+
+            if Cliente.objects.filter(email=email).exists():
+                errores.append(f"Fila {numero_fila}: el email '{email}' ya existe.")
+                continue
+
+            cliente = Cliente(nombre=nombre, email=email, telefono=telefono)
+
+            try:
+                cliente.full_clean()
+                cliente.save()
+                creados += 1
+            except Exception as e:
+                errores.append(f"Fila {numero_fila}: {e}")
+
+        if creados:
+            messages.success(request, f"Se importaron {creados} cliente(s) correctamente.")
+
+        if errores:
+            messages.warning(request, "Algunas filas no se importaron.")
+            return render(
+                request,
+                self.template_name,
+                {
+                    "form": ImportarClientesCSVForm(),
+                    "errores": errores,
+                    "creados": creados,
+                },
+            )
+
+        return redirect("cliente_list")
+
+
 class PeliculaListView(VistaPrivadaMixin, ListView):
     model = Pelicula
     template_name = "tienda/pelicula_list.html"
@@ -109,6 +204,7 @@ class PeliculaListView(VistaPrivadaMixin, ListView):
 
     def get_queryset(self):
         return super().get_queryset().select_related("categoria").prefetch_related("alquileres")
+
 
 class PeliculaCreateView(VistaConPermisoMixin, CreateView):
     permission_required = "tienda.add_pelicula"
@@ -190,7 +286,6 @@ class MarcarPagadoView(VistaPrivadaMixin, View):
         form = MarcarPagadoForm(request.POST)
         if form.is_valid():
             alquiler.marcar_pagado(fecha_devolucion=form.cleaned_data.get("fecha_devolucion"))
-
             next_url = request.GET.get("next")
             return redirect(next_url or "alquiler_list")
 

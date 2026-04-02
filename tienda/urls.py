@@ -19,6 +19,7 @@ urlpatterns = [
     path("clientes/nuevo/", views.ClienteCreateView.as_view(), name="cliente_create"),
     path("clientes/<int:pk>/editar/", views.ClienteUpdateView.as_view(), name="cliente_update"),
     path("clientes/<int:pk>/eliminar/", views.ClienteDeleteView.as_view(), name="cliente_delete"),
+    path("clientes/importar/", views.ImportarClientesCSVView.as_view(), name="cliente_importar"),
     # Alquileres
     path("alquileres/", views.AlquilerListView.as_view(), name="alquiler_list"),
     path("alquileres/nuevo/", views.AlquilerCreateView.as_view(), name="alquiler_create"),

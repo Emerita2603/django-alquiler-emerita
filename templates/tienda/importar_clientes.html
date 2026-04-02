@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block title %}Importar clientes{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Importar clientes desde CSV</h2>
+
+    <p class="help">
+        El archivo debe tener estas columnas: <strong>nombre,email,telefono</strong>
+    </p>
+
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button class="btn" type="submit">Importar</button>
+        <a class="btn secondary" href="{% url 'cliente_list' %}">Volver</a>
+    </form>
+
+    {% if creados %}
+        <p><strong>Clientes importados:</strong> {{ creados }}</p>
+    {% endif %}
+
+    {% if errores %}
+        <div style="margin-top: 16px;">
+            <h3>Errores encontrados</h3>
+            <ul>
+                {% for error in errores %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

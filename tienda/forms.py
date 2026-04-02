@@ -97,3 +97,12 @@ class SimularVentasForm(forms.Form):
             cleaned["hasta"] = today
 
         return cleaned
+
+class ImportarClientesCSVForm(forms.Form):
+    archivo = forms.FileField(label="Archivo CSV")
+
+    def clean_archivo(self):
+        archivo = self.cleaned_data["archivo"]
+        if not archivo.name.lower().endswith(".csv"):
+            raise forms.ValidationError("Debes subir un archivo CSV.")
+        return archivo
