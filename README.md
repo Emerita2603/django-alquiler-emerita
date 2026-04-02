@@ -481,3 +481,11 @@ Rúbrica simple (10 puntos):
 ## 15. Licencia y uso educativo
 
 Proyecto pensado para **uso educativo**. Si se publica, conviene aclarar versión de Python/Django y si `db.sqlite3` se ignora en Git (lo habitual).
+## Entrega del alumno
+
+Alumno: Emérita Chimboras Sandi  
+Código: 1616806  
+Token: 8D86EF6F17C2  
+
+Retos desarrollados:
+19, 23, 29, 32, 47, 50, 60, 69, 71, 82, 86, 89
