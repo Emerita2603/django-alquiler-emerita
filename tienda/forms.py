@@ -20,7 +20,7 @@ class CategoriaForm(forms.ModelForm):
 class ClienteForm(forms.ModelForm):
     class Meta:
         model = Cliente
-        fields = ["nombre", "email", "telefono"]
+        fields = ["dni", "nombre", "email", "telefono"]
 
 
 class PeliculaForm(forms.ModelForm):

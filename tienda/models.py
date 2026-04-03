@@ -1,6 +1,6 @@
 from decimal import Decimal
 
-from django.core.validators import MinValueValidator
+from django.core.validators import MinLengthValidator, MinValueValidator, RegexValidator
 from django.db import models
 from django.utils import timezone
 from django.utils.text import slugify
@@ -18,6 +18,17 @@ class Categoria(models.Model):
 
 
 class Cliente(models.Model):
+    dni = models.CharField(
+    max_length=8,
+    unique=True,
+    validators=[
+        MinLengthValidator(8),
+        RegexValidator(
+            regex=r"^\d{8}$",
+            message="El DNI debe tener exactamente 8 dígitos numéricos.",
+        ),
+    ],
+)
     nombre = models.CharField(max_length=120)
     email = models.EmailField(blank=True, null=True, unique=True)
     telefono = models.CharField(max_length=30, blank=True)
@@ -26,7 +37,7 @@ class Cliente(models.Model):
         ordering = ["nombre"]
 
     def __str__(self) -> str:
-        return self.nombre
+        return f"{self.nombre} - {self.dni}"
 
 
 class Pelicula(models.Model):

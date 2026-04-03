@@ -99,7 +99,7 @@ class ClienteListView(VistaPrivadaMixin, ListView):
 class ClienteCreateView(VistaConPermisoMixin, CreateView):
     permission_required = "tienda.add_cliente"
     model = Cliente
-    fields = ["nombre", "email", "telefono"]
+    fields = ["dni", "nombre", "email", "telefono"]
     template_name = "tienda/cliente_form.html"
     success_url = reverse_lazy("cliente_list")
 
@@ -107,7 +107,7 @@ class ClienteCreateView(VistaConPermisoMixin, CreateView):
 class ClienteUpdateView(VistaConPermisoMixin, UpdateView):
     permission_required = "tienda.change_cliente"
     model = Cliente
-    fields = ["nombre", "email", "telefono"]
+    fields = ["dni", "nombre", "email", "telefono"]
     template_name = "tienda/cliente_form.html"
     success_url = reverse_lazy("cliente_list")
 

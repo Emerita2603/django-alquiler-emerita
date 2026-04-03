@@ -19,6 +19,7 @@
             <table>
                 <thead>
                     <tr>
+                        <th>DNI</th>
                         <th>Nombre</th>
                         <th>Email</th>
                         <th>Teléfono</th>
@@ -28,6 +29,7 @@
                 <tbody>
                     {% for cliente in clientes %}
                         <tr>
+                            <td>{{ cliente.dni }}</td>
                             <td>{{ cliente.nombre }}</td>
                             <td>{{ cliente.email|default_if_none:"" }}</td>
                             <td>{{ cliente.telefono|default_if_none:"" }}</td>
@@ -43,7 +45,7 @@
                         </tr>
                     {% empty %}
                         <tr>
-                            <td colspan="4" class="help">No hay clientes todavía.</td>
+                            <td colspan="5" class="help">No hay clientes todavía.</td>
                         </tr>
                     {% endfor %}
                 </tbody>
