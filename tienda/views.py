@@ -27,9 +27,9 @@ from .models import Alquiler, Categoria, Cliente, Pelicula
 def index(request: HttpRequest) -> HttpResponse:
     total_peliculas = Pelicula.objects.count()
     total_clientes = Cliente.objects.count()
-    alquileres_pendientes = Alquiler.objects.filter(pagado=False).count()
+    alquileres_pendientes = Alquiler.objects.filter(estado="pendiente").count()
     ingresos = (
-        Alquiler.objects.filter(pagado=True)
+        Alquiler.objects.filter(estado="pagado")
         .aggregate(total=Sum("precio"))
         .get("total")
         or 0
@@ -282,11 +282,9 @@ class AlquilerListView(VistaPrivadaMixin, ListView):
 
     def get_queryset(self):
         qs = super().get_queryset().select_related("cliente", "pelicula", "pelicula__categoria")
-        pagado = self.request.GET.get("pagado")
-        if pagado == "1":
-            qs = qs.filter(pagado=True)
-        elif pagado == "0":
-            qs = qs.filter(pagado=False)
+        estado = self.request.GET.get("estado")
+        if estado in ["pendiente", "pagado", "anulado"]:
+            qs = qs.filter(estado=estado)
         return qs
 
 
@@ -316,7 +314,7 @@ class VentasListView(VistaPrivadaMixin, ListView):
 
     def get_queryset(self):
         return (
-            Alquiler.objects.filter(pagado=True)
+            Alquiler.objects.filter(estado="pagado")
             .select_related("cliente", "pelicula", "pelicula__categoria")
             .order_by("-fecha_alquiler")
         )
@@ -359,7 +357,7 @@ def simular_ventas(request: HttpRequest) -> HttpResponse:
                     cliente=cliente,
                     pelicula=pelicula,
                     fecha_alquiler=fecha_alquiler,
-                    pagado=True,
+                    estado="pagado",
                     fecha_devolucion=fecha_devolucion,
                 )
 

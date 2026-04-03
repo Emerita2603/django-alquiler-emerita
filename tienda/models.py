@@ -80,7 +80,19 @@ class Alquiler(models.Model):
 
     fecha_alquiler = models.DateField(default=timezone.localdate)
     fecha_devolucion = models.DateField(blank=True, null=True)
-    pagado = models.BooleanField(default=False)
+
+    ESTADO_CHOICES = [
+        ("pendiente", "Pendiente"),
+        ("pagado", "Pagado"),
+        ("anulado", "Anulado"),
+    ]
+
+    estado = models.CharField(
+        max_length=10,
+        choices=ESTADO_CHOICES,
+        default="pendiente",
+    )
+
     precio = models.DecimalField(max_digits=8, decimal_places=2, blank=True, null=True)
 
     class Meta:
@@ -93,11 +105,10 @@ class Alquiler(models.Model):
         if fecha_devolucion is None:
             fecha_devolucion = timezone.localdate()
 
-        self.pagado = True
+        self.estado = "pagado"
         self.fecha_devolucion = fecha_devolucion
-        self.save(update_fields=["pagado", "fecha_devolucion"])
+        self.save(update_fields=["estado", "fecha_devolucion"])
 
-    # 🔥 NUEVO MÉTODO (RETO 60)
     def calcular_mora(self):
         if not self.fecha_devolucion:
             return 0
@@ -107,8 +118,8 @@ class Alquiler(models.Model):
         if dias_retraso <= 0:
             return 0
 
-        dias_cobrables = min(dias_retraso, 9)  # máximo 9 días
-        return dias_cobrables * 5  # S/ 5 por día
+        dias_cobrables = min(dias_retraso, 9)
+        return dias_cobrables * 5
 
     def save(self, *args, **kwargs):
         if self.precio is None:

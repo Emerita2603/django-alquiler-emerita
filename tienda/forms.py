@@ -61,7 +61,7 @@ class AlquilerCreateForm(forms.ModelForm):
                 f"No se puede alquilar esta película porque el stock debe ser al menos {STOCK_MINIMO_PELICULA}."
             )
 
-        pendientes = Alquiler.objects.filter(cliente=cliente, pagado=False).count()
+        pendientes = Alquiler.objects.filter(cliente=cliente, estado="pendiente").count()
         if pendientes >= LIMITE_ALQUILERES_PENDIENTES:
             raise forms.ValidationError(
                 f"El cliente ya alcanzó el límite de {LIMITE_ALQUILERES_PENDIENTES} alquileres pendientes."
