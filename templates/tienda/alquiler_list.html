@@ -16,8 +16,9 @@
         <div style="margin-top: 12px">
             <div style="margin-bottom: 10px;">
                 <a class="btn secondary" href="{% url 'alquiler_list' %}">Todos</a>
-                <a class="btn secondary" href="{% url 'alquiler_list' %}?pagado=0">Pendientes</a>
-                <a class="btn secondary" href="{% url 'alquiler_list' %}?pagado=1">Pagados</a>
+                <a class="btn secondary" href="{% url 'alquiler_list' %}?estado=pendiente">Pendientes</a>
+                <a class="btn secondary" href="{% url 'alquiler_list' %}?estado=pagado">Pagados</a>
+                <a class="btn secondary" href="{% url 'alquiler_list' %}?estado=anulado">Anulados</a>
             </div>
 
             <table>
@@ -28,7 +29,7 @@
                         <th>Película</th>
                         <th>Categoría</th>
                         <th>Precio</th>
-                        <th>Mora</th> <!-- 🔥 NUEVO -->
+                        <th>Mora</th>
                         <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
@@ -40,26 +41,26 @@
                             <td>{{ alquiler.cliente.nombre }}</td>
                             <td>{{ alquiler.pelicula.titulo }}</td>
                             <td>{{ alquiler.pelicula.categoria.nombre }}</td>
-
                             <td>{{ alquiler.precio|soles }}</td>
-
-                            <!-- 🔥 MORA -->
                             <td>S/ {{ alquiler.calcular_mora }}</td>
 
                             <td>
-                                {% if alquiler.pagado %}
+                                {% if alquiler.estado == "pagado" %}
                                     <span style="color: green; font-weight: bold;">Pagado</span><br>
-                                    <small>Devuelto: {{ alquiler.fecha_devolucion }}</small>
+                                    <small>Devuelto: {{ alquiler.fecha_devolucion }}</small><br>
+                                    <small>Pagado: {{ alquiler.fecha_pago }}</small>
+                                {% elif alquiler.estado == "anulado" %}
+                                    <span style="color: red; font-weight: bold;">Anulado</span>
                                 {% else %}
                                     <span style="color: orange; font-weight: bold;">Pendiente</span>
                                 {% endif %}
                             </td>
 
                             <td class="actions">
-                                {% if not alquiler.pagado and perms.tienda.change_alquiler %}
-                                <a class="btn" href="{% url 'alquiler_marcar_pagado' alquiler.pk %}">
-                                    Marcar pagado
-                                </a>
+                                {% if alquiler.estado == "pendiente" and perms.tienda.change_alquiler %}
+                                    <a class="btn" href="{% url 'alquiler_marcar_pagado' alquiler.pk %}">
+                                        Marcar pagado
+                                    </a>
                                 {% else %}
                                     <span class="help">Ya cuenta como venta</span>
                                 {% endif %}

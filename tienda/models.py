@@ -80,6 +80,7 @@ class Alquiler(models.Model):
 
     fecha_alquiler = models.DateField(default=timezone.localdate)
     fecha_devolucion = models.DateField(blank=True, null=True)
+    fecha_pago = models.DateField(blank=True, null=True)
 
     ESTADO_CHOICES = [
         ("pendiente", "Pendiente"),
@@ -107,7 +108,8 @@ class Alquiler(models.Model):
 
         self.estado = "pagado"
         self.fecha_devolucion = fecha_devolucion
-        self.save(update_fields=["estado", "fecha_devolucion"])
+        self.fecha_pago = timezone.localdate()
+        self.save(update_fields=["estado", "fecha_devolucion", "fecha_pago"])
 
     def calcular_mora(self):
         if not self.fecha_devolucion:
