@@ -125,6 +125,11 @@ class Alquiler(models.Model):
     def __str__(self) -> str:
         return f"Alquiler: {self.pelicula} - {self.cliente}"
 
+    def clean(self):
+        if self.fecha_devolucion and self.fecha_devolucion < self.fecha_alquiler:
+            from django.core.exceptions import ValidationError
+            raise ValidationError("La fecha de devolución no puede ser anterior a la fecha de alquiler.")
+
     def marcar_pagado(self, fecha_devolucion=None) -> None:
         if fecha_devolucion is None:
             fecha_devolucion = timezone.localdate()
@@ -149,4 +154,5 @@ class Alquiler(models.Model):
     def save(self, *args, **kwargs):
         if self.precio is None:
             self.precio = self.pelicula.precio_alquiler
+        self.full_clean()
         super().save(*args, **kwargs)
