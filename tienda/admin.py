@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Alquiler, Categoria, Cliente, Pelicula
+from .models import Alquiler, Categoria, Cliente, MetodoPago, Pelicula
 
 
 @admin.register(Categoria)
@@ -15,6 +15,12 @@ class ClienteAdmin(admin.ModelAdmin):
     search_fields = ("dni", "nombre", "email")
 
 
+@admin.register(MetodoPago)
+class MetodoPagoAdmin(admin.ModelAdmin):
+    list_display = ("nombre",)
+    search_fields = ("nombre",)
+
+
 @admin.register(Pelicula)
 class PeliculaAdmin(admin.ModelAdmin):
     list_display = ("titulo", "anio", "categoria", "precio_alquiler", "stock")
@@ -24,6 +30,6 @@ class PeliculaAdmin(admin.ModelAdmin):
 
 @admin.register(Alquiler)
 class AlquilerAdmin(admin.ModelAdmin):
-    list_display = ("fecha_alquiler", "cliente", "pelicula", "estado", "precio", "fecha_devolucion")
-    list_filter = ("estado", "fecha_alquiler", "fecha_devolucion")
+    list_display = ("fecha_alquiler", "cliente", "pelicula", "metodo_pago", "estado", "precio", "fecha_devolucion")
+    list_filter = ("estado", "fecha_alquiler", "fecha_devolucion", "metodo_pago")
     search_fields = ("cliente__nombre", "pelicula__titulo")

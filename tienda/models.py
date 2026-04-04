@@ -40,6 +40,15 @@ class Cliente(models.Model):
         return f"{self.nombre} - {self.dni}"
 
 
+class MetodoPago(models.Model):
+    nombre = models.CharField(max_length=50, unique=True)
+
+    class Meta:
+        ordering = ["nombre"]
+
+    def __str__(self) -> str:
+        return self.nombre
+
 class Pelicula(models.Model):
     titulo = models.CharField(max_length=200)
     slug = models.SlugField(max_length=255, unique=True, blank=True)
@@ -77,6 +86,13 @@ class Pelicula(models.Model):
 class Alquiler(models.Model):
     cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name="alquileres")
     pelicula = models.ForeignKey(Pelicula, on_delete=models.PROTECT, related_name="alquileres")
+    metodo_pago = models.ForeignKey(
+        MetodoPago,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="alquileres",
+    )
 
     fecha_alquiler = models.DateField(default=timezone.localdate)
     fecha_devolucion = models.DateField(blank=True, null=True)
