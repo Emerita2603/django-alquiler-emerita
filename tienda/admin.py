@@ -23,7 +23,7 @@ class MetodoPagoAdmin(admin.ModelAdmin):
 
 @admin.register(Pelicula)
 class PeliculaAdmin(admin.ModelAdmin):
-    list_display = ("titulo", "anio", "categoria", "precio_alquiler", "stock")
+    list_display = ("titulo", "director", "pais_origen", "duracion_minutos", "anio", "categoria", "precio_alquiler", "stock")
     list_filter = ("categoria", "anio")
     search_fields = ("titulo", "slug")
 

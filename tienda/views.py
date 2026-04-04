@@ -218,7 +218,18 @@ class PeliculaListView(VistaPrivadaMixin, ListView):
 class PeliculaCreateView(VistaConPermisoMixin, CreateView):
     permission_required = "tienda.add_pelicula"
     model = Pelicula
-    fields = ["titulo", "slug", "anio", "categoria", "precio_alquiler", "stock"]
+    fields = [
+    "titulo",
+    "slug",
+    "descripcion",
+    "director",
+    "pais_origen",
+    "duracion_minutos",
+    "anio",
+    "categoria",
+    "precio_alquiler",
+    "stock",
+]
     template_name = "tienda/pelicula_form.html"
     success_url = reverse_lazy("pelicula_list")
 
@@ -226,7 +237,18 @@ class PeliculaCreateView(VistaConPermisoMixin, CreateView):
 class PeliculaUpdateView(VistaConPermisoMixin, UpdateView):
     permission_required = "tienda.change_pelicula"
     model = Pelicula
-    fields = ["titulo", "slug", "anio", "categoria", "precio_alquiler", "stock"]
+    fields = [
+    "titulo",
+    "slug",
+    "descripcion",
+    "director",
+    "pais_origen",
+    "duracion_minutos",
+    "anio",
+    "categoria",
+    "precio_alquiler",
+    "stock",
+]
     template_name = "tienda/pelicula_form.html"
     success_url = reverse_lazy("pelicula_list")
 

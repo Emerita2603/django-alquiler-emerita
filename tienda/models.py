@@ -53,6 +53,9 @@ class Pelicula(models.Model):
     titulo = models.CharField(max_length=200)
     slug = models.SlugField(max_length=255, unique=True, blank=True)
     descripcion = models.TextField(blank=True)
+    director = models.CharField(max_length=120, blank=True)
+    pais_origen = models.CharField(max_length=80, blank=True)
+    
     duracion_minutos = models.PositiveIntegerField(
         validators=[MinValueValidator(1)],
         help_text="Duración de la película en minutos.",
