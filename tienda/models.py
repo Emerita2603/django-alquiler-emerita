@@ -121,6 +121,13 @@ class Alquiler(models.Model):
 
     class Meta:
         ordering = ["-fecha_alquiler", "-id"]
+        constraints = [
+            models.UniqueConstraint(
+            fields=["cliente", "pelicula", "fecha_alquiler"],
+            name="unique_alquiler_cliente_pelicula_fecha",
+        )
+    ]
+    
 
     def __str__(self) -> str:
         return f"Alquiler: {self.pelicula} - {self.cliente}"
