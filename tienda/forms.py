@@ -4,7 +4,7 @@ import datetime
 
 from django import forms
 
-from .models import Alquiler, Categoria, Cliente, Pelicula
+from .models import Alquiler, Categoria, Cliente, MetodoPago, Pelicula
 from django.conf import settings
 
 STOCK_MINIMO_PELICULA = 2
@@ -75,6 +75,12 @@ class MarcarPagadoForm(forms.Form):
         required=False,
         label="Fecha de devolución (opcional)",
         widget=forms.DateInput(attrs={"type": "date"}),
+    )
+
+    metodo_pago = forms.ModelChoiceField(
+        queryset=MetodoPago.objects.all(),
+        required=True,
+        label="Método de pago",
     )
 
 

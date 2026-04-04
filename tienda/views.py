@@ -302,8 +302,12 @@ class MarcarPagadoView(VistaPrivadaMixin, View):
 
         if form.is_valid():
             alquiler.marcar_pagado(
-                fecha_devolucion=form.cleaned_data.get("fecha_devolucion")
+                 fecha_devolucion=form.cleaned_data.get("fecha_devolucion")
             )
+
+            alquiler.metodo_pago = form.cleaned_data.get("metodo_pago")
+            alquiler.save(update_fields=["metodo_pago"])
+
             messages.success(request, "El alquiler fue marcado como pagado correctamente.")
             next_url = request.GET.get("next")
             return redirect(next_url or "alquiler_list")
