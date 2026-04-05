@@ -31,6 +31,7 @@ from .models import Pelicula
 
 class PeliculaForm(forms.ModelForm):
     titulo = forms.CharField(
+        required=True,
         error_messages={"required": "El título no puede estar vacío."}
     )
 
@@ -48,6 +49,17 @@ class PeliculaForm(forms.ModelForm):
             "precio_alquiler",
             "stock",
         ]
+        widgets = {
+            "titulo": forms.TextInput(attrs={"placeholder": "Ej: Batman"}),
+            "slug": forms.TextInput(attrs={"placeholder": "Debe empezar con emerit-97"}),
+            "descripcion": forms.Textarea(attrs={"placeholder": "Descripción de la película"}),
+            "director": forms.TextInput(attrs={"placeholder": "Nombre del director"}),
+            "pais_origen": forms.TextInput(attrs={"placeholder": "Ej: USA, Perú"}),
+            "duracion_minutos": forms.NumberInput(attrs={"placeholder": "Ej: 120"}),
+            "anio": forms.NumberInput(attrs={"placeholder": "Ej: 2020"}),
+            "precio_alquiler": forms.NumberInput(attrs={"placeholder": "Ej: 10.00"}),
+            "stock": forms.NumberInput(attrs={"placeholder": "Cantidad disponible"}),
+        }
 
     def clean_titulo(self):
         titulo = self.cleaned_data["titulo"].strip()
@@ -84,6 +96,10 @@ class AlquilerCreateForm(forms.ModelForm):
     class Meta:
         model = Alquiler
         fields = ["cliente", "pelicula"]
+        help_texts = {
+            "cliente": "Seleccione el cliente que alquila.",
+            "pelicula": "Solo películas con stock disponible.",
+        }
 
     def clean(self):
         cleaned = super().clean()
