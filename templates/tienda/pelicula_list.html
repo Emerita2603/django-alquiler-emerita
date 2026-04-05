@@ -8,12 +8,21 @@
     <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap">
         <h2 style="margin: 0">Películas</h2>
 
-        {% if perms.tienda.add_pelicula %}
-        <a class="btn" href="{% url 'pelicula_create' %}">Nueva película</a>
-        {% endif %}
+        <div style="display: flex; gap: 10px;">
+            {% if perms.tienda.add_pelicula %}
+            <a class="btn" href="{% url 'pelicula_create' %}">Nueva película</a>
+            {% endif %}
+
+            {% if perms.tienda.view_pelicula %}
+            <a class="btn secondary" href="{% url 'pelicula_exportar' %}">Exportar CSV</a>
+            {% endif %}
+        </div>
     </div>
 
-    <form method="get" style="margin-top: 16px; margin-bottom: 16px; display: flex; gap: 12px; flex-wrap: wrap; align-items: end;">
+    <!-- FILTROS -->
+    <form method="get"
+        style="margin-top: 16px; margin-bottom: 16px; display: flex; gap: 12px; flex-wrap: wrap; align-items: end;">
+
         <div>
             <label for="anio">Año</label>
             <input type="number" id="anio" name="anio" value="{{ filtro_anio }}">
@@ -24,9 +33,9 @@
             <select id="categoria" name="categoria">
                 <option value="">Todas</option>
                 {% for categoria in categorias %}
-                    <option value="{{ categoria.id }}" {% if filtro_categoria == categoria.id|stringformat:"s" %}selected{% endif %}>
-                        {{ categoria.nombre }}
-                    </option>
+                <option value="{{ categoria.id }}" {% if filtro_categoria == categoria.id %}selected{% endif %}>
+                    {{ categoria.nombre }}
+                </option>
                 {% endfor %}
             </select>
         </div>
@@ -47,6 +56,7 @@
         </div>
     </form>
 
+    <!-- TABLA -->
     <div style="margin-top: 12px">
         <table>
             <thead>

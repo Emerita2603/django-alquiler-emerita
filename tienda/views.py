@@ -368,6 +368,41 @@ class ExportarClientesCSVView(VistaConPermisoMixin, View):
 
         return response
 
+class ExportarPeliculasCSVView(VistaConPermisoMixin, View):
+    permission_required = "tienda.view_pelicula"
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = 'attachment; filename="peliculas.csv"'
+
+        writer = csv.writer(response)
+        writer.writerow([
+            "titulo",
+            "director",
+            "pais_origen",
+            "duracion_minutos",
+            "anio",
+            "categoria",
+            "precio_alquiler",
+            "stock",
+        ])
+
+        peliculas = Pelicula.objects.select_related("categoria").order_by("titulo")
+
+        for pelicula in peliculas:
+            writer.writerow([
+                pelicula.titulo,
+                pelicula.director or "",
+                pelicula.pais_origen or "",
+                pelicula.duracion_minutos,
+                pelicula.anio,
+                pelicula.categoria.nombre if pelicula.categoria else "",
+                pelicula.precio_alquiler,
+                pelicula.stock,
+            ])
+
+        return response        
+
 class PeliculaListView(VistaPrivadaMixin, ListView):
     model = Pelicula
     template_name = "tienda/pelicula_list.html"
@@ -399,11 +434,10 @@ class PeliculaListView(VistaPrivadaMixin, ListView):
         ctx = super().get_context_data(**kwargs)
         ctx["categorias"] = Categoria.objects.all().order_by("nombre")
         ctx["filtro_anio"] = self.request.GET.get("anio", "")
-        ctx["filtro_categoria"] = self.request.GET.get("categoria", "")
+        ctx["filtro_categoria"] = int(self.request.GET.get("categoria")) if self.request.GET.get("categoria") else None
         ctx["filtro_precio_min"] = self.request.GET.get("precio_min", "")
         ctx["filtro_precio_max"] = self.request.GET.get("precio_max", "")
         return ctx
-
 
 class TopPeliculasView(VistaPrivadaMixin, ListView):
     model = Pelicula
