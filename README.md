@@ -489,3 +489,63 @@ Token: 8D86EF6F17C2
 
 Retos desarrollados:
 19, 23, 29, 32, 47, 50, 60, 69, 71, 82, 86, 89
+
+---
+
+## Reto 20 — Diferencia entre consultas con y sin optimización
+
+En este proyecto se optimizaron varios listados usando `select_related()` y `prefetch_related()` para reducir consultas repetidas a la base de datos.
+
+### Caso 1: listado de películas
+
+Sin optimización:
+
+```python
+Pelicula.objects.all()
+
+Problema:
+
+Django obtiene primero las películas.
+Luego, por cada película, consulta su categoría.
+Esto genera múltiples consultas (problema N+1).
+
+Con optimización:
+
+Pelicula.objects.select_related("categoria").prefetch_related("alquileres")
+
+Ventaja:
+
+select_related("categoria") trae la categoría en la misma consulta.
+prefetch_related("alquileres") evita consultas repetidas.
+Mejora el rendimiento.
+Caso 2: listado de alquileres
+
+Sin optimización:
+
+Alquiler.objects.all()
+
+Problema:
+
+Por cada alquiler, Django consulta:
+cliente
+película
+categoría
+
+Con optimización:
+
+Alquiler.objects.select_related("cliente", "pelicula", "pelicula__categoria")
+
+Ventaja:
+
+Reduce consultas.
+Carga relaciones en una sola operación.
+Caso 3: listado de clientes
+
+Con optimización:
+
+Cliente.objects.prefetch_related("alquileres")
+
+Ventaja:
+
+Evita consultas repetidas por cada cliente.
+Mejora rendimiento en listados.
