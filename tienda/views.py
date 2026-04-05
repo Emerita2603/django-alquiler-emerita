@@ -350,7 +350,35 @@ class PeliculaListView(VistaPrivadaMixin, ListView):
     context_object_name = "peliculas"
 
     def get_queryset(self):
-        return super().get_queryset().select_related("categoria").prefetch_related("alquileres")
+        qs = super().get_queryset().select_related("categoria").prefetch_related("alquileres")
+
+        anio = self.request.GET.get("anio")
+        categoria = self.request.GET.get("categoria")
+        precio_min = self.request.GET.get("precio_min")
+        precio_max = self.request.GET.get("precio_max")
+
+        if anio:
+            qs = qs.filter(anio=anio)
+
+        if categoria:
+            qs = qs.filter(categoria_id=categoria)
+
+        if precio_min:
+            qs = qs.filter(precio_alquiler__gte=precio_min)
+
+        if precio_max:
+            qs = qs.filter(precio_alquiler__lte=precio_max)
+
+        return qs
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["categorias"] = Categoria.objects.all().order_by("nombre")
+        ctx["filtro_anio"] = self.request.GET.get("anio", "")
+        ctx["filtro_categoria"] = self.request.GET.get("categoria", "")
+        ctx["filtro_precio_min"] = self.request.GET.get("precio_min", "")
+        ctx["filtro_precio_max"] = self.request.GET.get("precio_max", "")
+        return ctx
 
 
 class TopPeliculasView(VistaPrivadaMixin, ListView):

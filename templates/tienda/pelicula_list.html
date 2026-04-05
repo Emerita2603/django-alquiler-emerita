@@ -13,6 +13,40 @@
         {% endif %}
     </div>
 
+    <form method="get" style="margin-top: 16px; margin-bottom: 16px; display: flex; gap: 12px; flex-wrap: wrap; align-items: end;">
+        <div>
+            <label for="anio">Año</label>
+            <input type="number" id="anio" name="anio" value="{{ filtro_anio }}">
+        </div>
+
+        <div>
+            <label for="categoria">Categoría</label>
+            <select id="categoria" name="categoria">
+                <option value="">Todas</option>
+                {% for categoria in categorias %}
+                    <option value="{{ categoria.id }}" {% if filtro_categoria == categoria.id|stringformat:"s" %}selected{% endif %}>
+                        {{ categoria.nombre }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div>
+            <label for="precio_min">Precio mínimo</label>
+            <input type="number" step="0.01" id="precio_min" name="precio_min" value="{{ filtro_precio_min }}">
+        </div>
+
+        <div>
+            <label for="precio_max">Precio máximo</label>
+            <input type="number" step="0.01" id="precio_max" name="precio_max" value="{{ filtro_precio_max }}">
+        </div>
+
+        <div style="display: flex; gap: 8px;">
+            <button class="btn" type="submit">Filtrar</button>
+            <a class="btn secondary" href="{% url 'pelicula_list' %}">Limpiar</a>
+        </div>
+    </form>
+
     <div style="margin-top: 12px">
         <table>
             <thead>
@@ -50,7 +84,7 @@
 
                 {% empty %}
                 <tr>
-                    <td colspan="7" class="help">No hay películas todavía.</td>
+                    <td colspan="7" class="help">No hay películas para mostrar con esos filtros.</td>
                 </tr>
                 {% endfor %}
             </tbody>
