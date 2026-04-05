@@ -31,6 +31,7 @@ urlpatterns = [
     path("reportes/alquileres-vencidos/", views.AlquileresVencidosView.as_view(), name="alquileres_vencidos"),
     path("reportes/ranking-clientes-mensual/", views.RankingClientesMensualView.as_view(), name="ranking_clientes_mensual"),
     path("reportes/ventas-por-dia/", views.VentasPorDiaView.as_view(), name="ventas_por_dia"),
+    path("clientes/exportar/", views.ExportarClientesCSVView.as_view(), name="cliente_exportar"),
     # Ventas (en esta versión: alquileres pagados)
     path("ventas/", views.VentasListView.as_view(), name="ventas_list"),
     path("ventas/simular/", views.simular_ventas, name="ventas_simular"),

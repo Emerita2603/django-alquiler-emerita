@@ -346,6 +346,28 @@ class ImportarClientesCSVView(VistaConPermisoMixin, View):
         return redirect("cliente_list")
 
 
+class ExportarClientesCSVView(VistaConPermisoMixin, View):
+    permission_required = "tienda.view_cliente"
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = 'attachment; filename="clientes.csv"'
+
+        writer = csv.writer(response)
+        writer.writerow(["dni", "nombre", "email", "telefono"])
+
+        clientes = Cliente.objects.all().order_by("nombre")
+
+        for cliente in clientes:
+            writer.writerow([
+                cliente.dni,
+                cliente.nombre,
+                cliente.email or "",
+                cliente.telefono or "",
+            ])
+
+        return response
+
 class PeliculaListView(VistaPrivadaMixin, ListView):
     model = Pelicula
     template_name = "tienda/pelicula_list.html"
