@@ -7,6 +7,12 @@ from django import forms
 from .models import Alquiler, Categoria, Cliente, MetodoPago, Pelicula
 from django.conf import settings
 
+
+from django import forms
+from django.conf import settings
+from django.utils import timezone
+from .models import Pelicula
+
 STOCK_MINIMO_PELICULA = 2
 LIMITE_ALQUILERES_PENDIENTES = 4
 
@@ -21,12 +27,19 @@ class ClienteForm(forms.ModelForm):
     class Meta:
         model = Cliente
         fields = ["dni", "nombre", "email", "telefono"]
+        help_texts = {
+            "dni": "Debe tener exactamente 8 dígitos.",
+            "email": "Se guardará en minúsculas.",
+        }
 
+    def clean_email(self):
+        email = self.cleaned_data.get("email")
 
-from django import forms
-from django.conf import settings
-from django.utils import timezone
-from .models import Pelicula
+        if email:
+            email = email.strip().lower()
+
+        return email
+
 
 
 class PeliculaForm(forms.ModelForm):
