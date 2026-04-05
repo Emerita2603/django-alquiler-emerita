@@ -40,6 +40,14 @@ class ClienteForm(forms.ModelForm):
 
         return email
 
+    def clean_nombre(self):
+        nombre = self.cleaned_data.get("nombre", "").strip()
+
+        if not nombre:
+            raise forms.ValidationError("El nombre no puede estar vacío.")
+
+        return nombre
+
 
 
 class PeliculaForm(forms.ModelForm):
