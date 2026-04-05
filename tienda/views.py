@@ -149,6 +149,43 @@ class TicketPromedioView(VistaPrivadaMixin, View):
             {"promedio": promedio},
         )
 
+class RankingClientesMensualView(VistaPrivadaMixin, View):
+    template_name = "tienda/ranking_clientes_mensual.html"
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        hoy = timezone.localdate()
+
+        try:
+            mes = int(request.GET.get("mes", hoy.month))
+        except (TypeError, ValueError):
+            mes = hoy.month
+
+        try:
+            anio = int(request.GET.get("anio", hoy.year))
+        except (TypeError, ValueError):
+            anio = hoy.year
+
+        datos = (
+            Alquiler.objects
+            .filter(
+                estado="pagado",
+                fecha_alquiler__month=mes,
+                fecha_alquiler__year=anio,
+            )
+            .values("cliente__id", "cliente__nombre", "cliente__dni")
+            .annotate(total_gastado=Sum("precio"))
+            .order_by("-total_gastado", "cliente__nombre")
+        )
+
+        return render(
+            request,
+            self.template_name,
+            {
+                "datos": datos,
+                "mes": mes,
+                "anio": anio,
+            },
+        )
 class AlquileresVencidosView(VistaPrivadaMixin, ListView):
     model = Alquiler
     template_name = "tienda/alquileres_vencidos.html"

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load soles %}
+
+{% block title %}Ranking mensual de clientes{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="margin-top: 0;">Ranking mensual de clientes por gasto total</h2>
+
+    <form method="get" style="margin-bottom: 16px; display: flex; gap: 12px; align-items: end; flex-wrap: wrap;">
+        <div>
+            <label for="mes">Mes</label>
+            <input type="number" id="mes" name="mes" min="1" max="12" value="{{ mes }}">
+        </div>
+        <div>
+            <label for="anio">Año</label>
+            <input type="number" id="anio" name="anio" min="2000" max="2100" value="{{ anio }}">
+        </div>
+        <div>
+            <button class="btn" type="submit">Filtrar</button>
+        </div>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Puesto</th>
+                <th>DNI</th>
+                <th>Cliente</th>
+                <th>Total gastado</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in datos %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ item.cliente__dni }}</td>
+                <td>{{ item.cliente__nombre }}</td>
+                <td>{{ item.total_gastado|soles }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="help">No hay ventas pagadas para ese mes.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
