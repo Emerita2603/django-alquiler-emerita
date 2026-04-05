@@ -18,6 +18,7 @@ from .forms import (
     AlquilerCreateForm,
     ImportarClientesCSVForm,
     MarcarPagadoForm,
+    PeliculaForm,
     SimularVentasForm,
 )
 from .mixins import VistaConPermisoMixin, VistaPrivadaMixin
@@ -415,18 +416,7 @@ class IngresosPorCategoriaView(VistaPrivadaMixin, View):
 class PeliculaCreateView(VistaConPermisoMixin, CreateView):
     permission_required = "tienda.add_pelicula"
     model = Pelicula
-    fields = [
-    "titulo",
-    "slug",
-    "descripcion",
-    "director",
-    "pais_origen",
-    "duracion_minutos",
-    "anio",
-    "categoria",
-    "precio_alquiler",
-    "stock",
-]
+    form_class = PeliculaForm
     template_name = "tienda/pelicula_form.html"
     success_url = reverse_lazy("pelicula_list")
 
@@ -434,18 +424,7 @@ class PeliculaCreateView(VistaConPermisoMixin, CreateView):
 class PeliculaUpdateView(VistaConPermisoMixin, UpdateView):
     permission_required = "tienda.change_pelicula"
     model = Pelicula
-    fields = [
-    "titulo",
-    "slug",
-    "descripcion",
-    "director",
-    "pais_origen",
-    "duracion_minutos",
-    "anio",
-    "categoria",
-    "precio_alquiler",
-    "stock",
-]
+    form_class = PeliculaForm
     template_name = "tienda/pelicula_form.html"
     success_url = reverse_lazy("pelicula_list")
 

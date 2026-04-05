@@ -23,6 +23,12 @@ class ClienteForm(forms.ModelForm):
         fields = ["dni", "nombre", "email", "telefono"]
 
 
+from django import forms
+from django.conf import settings
+from django.utils import timezone
+from .models import Pelicula
+
+
 class PeliculaForm(forms.ModelForm):
     class Meta:
         model = Pelicula
@@ -41,6 +47,15 @@ class PeliculaForm(forms.ModelForm):
                 f"El precio no puede ser menor a {settings.PRECIO_MINIMO_PELICULA} soles."
             )
         return precio
+
+    def clean_anio(self):
+        anio = self.cleaned_data["anio"]
+        anio_actual = timezone.localdate().year
+
+        if anio > anio_actual:
+            raise forms.ValidationError("El año no puede ser mayor al actual.")
+
+        return anio    
 
 
 class AlquilerCreateForm(forms.ModelForm):
