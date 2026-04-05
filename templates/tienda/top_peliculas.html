@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Top 10 películas más alquiladas{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="margin-top: 0;">Top 10 películas más alquiladas</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Puesto</th>
+                <th>Título</th>
+                <th>Categoría</th>
+                <th>Año</th>
+                <th>Total alquileres</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for pelicula in peliculas %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>{{ pelicula.titulo }}</td>
+                <td>{{ pelicula.categoria.nombre }}</td>
+                <td>{{ pelicula.anio }}</td>
+                <td>{{ pelicula.total_alquileres }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="help">No hay datos suficientes para mostrar el ranking.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

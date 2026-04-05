@@ -5,7 +5,7 @@ import random
 
 from django.contrib import messages
 from django.db import transaction
-from django.db.models import F, Sum
+from django.db.models import Count, F, Sum
 from django.db.models.deletion import ProtectedError
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -214,6 +214,18 @@ class PeliculaListView(VistaPrivadaMixin, ListView):
     def get_queryset(self):
         return super().get_queryset().select_related("categoria").prefetch_related("alquileres")
 
+
+class TopPeliculasView(VistaPrivadaMixin, ListView):
+    model = Pelicula
+    template_name = "tienda/top_peliculas.html"
+    context_object_name = "peliculas"
+
+    def get_queryset(self):
+        return (
+            Pelicula.objects
+            .annotate(total_alquileres=Count("alquileres"))
+            .order_by("-total_alquileres", "titulo")[:10]
+        )
 
 class PeliculaCreateView(VistaConPermisoMixin, CreateView):
     permission_required = "tienda.add_pelicula"

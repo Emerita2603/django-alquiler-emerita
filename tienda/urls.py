@@ -23,11 +23,8 @@ urlpatterns = [
     # Alquileres
     path("alquileres/", views.AlquilerListView.as_view(), name="alquiler_list"),
     path("alquileres/nuevo/", views.AlquilerCreateView.as_view(), name="alquiler_create"),
-    path(
-        "alquileres/<int:pk>/marcar-pagado/",
-        views.MarcarPagadoView.as_view(),
-        name="alquiler_marcar_pagado",
-    ),
+    path("alquileres/<int:pk>/marcar-pagado/", views.MarcarPagadoView.as_view(), name="alquiler_marcar_pagado"),
+    path("reportes/top-peliculas/", views.TopPeliculasView.as_view(), name="top_peliculas"),    
     # Ventas (en esta versión: alquileres pagados)
     path("ventas/", views.VentasListView.as_view(), name="ventas_list"),
     path("ventas/simular/", views.simular_ventas, name="ventas_simular"),
