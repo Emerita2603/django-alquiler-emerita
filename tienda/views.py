@@ -119,6 +119,20 @@ class ClienteDeleteView(VistaConPermisoMixin, DeleteView):
     success_url = reverse_lazy("cliente_list")
 
 
+class ClientesSinAlquilerView(VistaPrivadaMixin, ListView):
+    model = Cliente
+    template_name = "tienda/clientes_sin_alquiler.html"
+    context_object_name = "clientes"
+
+    def get_queryset(self):
+        return (
+            Cliente.objects
+            .annotate(total_alquileres=Count("alquileres"))
+            .filter(total_alquileres=0)
+            .order_by("nombre")
+        )    
+
+
 class ImportarClientesCSVView(VistaConPermisoMixin, View):
     permission_required = "tienda.add_cliente"
     template_name = "tienda/importar_clientes.html"

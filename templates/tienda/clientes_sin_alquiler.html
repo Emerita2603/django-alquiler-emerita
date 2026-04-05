@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block title %}Clientes sin alquileres{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="margin-top: 0;">Clientes sin alquileres</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>DNI</th>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Teléfono</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for cliente in clientes %}
+            <tr>
+                <td>{{ cliente.dni }}</td>
+                <td>{{ cliente.nombre }}</td>
+                <td>{{ cliente.email|default:"-" }}</td>
+                <td>{{ cliente.telefono|default:"-" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="4" class="help">Todos los clientes tienen al menos un alquiler.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
