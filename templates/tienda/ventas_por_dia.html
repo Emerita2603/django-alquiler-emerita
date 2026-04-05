@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load soles %}
+
+{% block title %}Ventas por día{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="margin-top: 0;">Ventas por día</h2>
+
+    <form method="get" style="margin-bottom: 16px; display: flex; gap: 12px; align-items: end; flex-wrap: wrap;">
+        <div>
+            <label for="desde">Desde</label>
+            <input type="date" id="desde" name="desde" value="{{ desde|date:'Y-m-d' }}">
+        </div>
+        <div>
+            <label for="hasta">Hasta</label>
+            <input type="date" id="hasta" name="hasta" value="{{ hasta|date:'Y-m-d' }}">
+        </div>
+        <div>
+            <button class="btn" type="submit">Filtrar</button>
+        </div>
+    </form>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha</th>
+                <th>Total ventas</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in datos %}
+            <tr>
+                <td>{{ item.fecha_alquiler }}</td>
+                <td>{{ item.total_ventas|soles }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2" class="help">No hay ventas pagadas en ese rango.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div style="margin-top: 16px; font-weight: bold;">
+        Total general del rango: {{ total_general|soles }}
+    </div>
+</div>
+{% endblock %}

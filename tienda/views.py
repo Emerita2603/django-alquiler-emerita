@@ -186,6 +186,64 @@ class RankingClientesMensualView(VistaPrivadaMixin, View):
                 "anio": anio,
             },
         )
+
+class VentasPorDiaView(VistaPrivadaMixin, View):
+    template_name = "tienda/ventas_por_dia.html"
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        hoy = timezone.localdate()
+
+        desde_str = request.GET.get("desde")
+        hasta_str = request.GET.get("hasta")
+
+        try:
+            desde = datetime.datetime.strptime(desde_str, "%Y-%m-%d").date() if desde_str else hoy
+        except ValueError:
+            desde = hoy
+
+        try:
+            hasta = datetime.datetime.strptime(hasta_str, "%Y-%m-%d").date() if hasta_str else hoy
+        except ValueError:
+            hasta = hoy
+
+        if desde > hasta:
+            desde, hasta = hasta, desde
+
+        datos = (
+            Alquiler.objects
+            .filter(
+                estado="pagado",
+                fecha_alquiler__gte=desde,
+                fecha_alquiler__lte=hasta,
+            )
+            .values("fecha_alquiler")
+            .annotate(total_ventas=Sum("precio"))
+            .order_by("fecha_alquiler")
+        )
+
+        total_general = (
+            Alquiler.objects
+            .filter(
+                estado="pagado",
+                fecha_alquiler__gte=desde,
+                fecha_alquiler__lte=hasta,
+            )
+            .aggregate(total=Sum("precio"))
+            .get("total")
+            or 0
+        )
+
+        return render(
+            request,
+            self.template_name,
+            {
+                "datos": datos,
+                "desde": desde,
+                "hasta": hasta,
+                "total_general": total_general,
+            },
+        )
+
 class AlquileresVencidosView(VistaPrivadaMixin, ListView):
     model = Alquiler
     template_name = "tienda/alquileres_vencidos.html"
