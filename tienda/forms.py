@@ -106,6 +106,13 @@ class AlquilerCreateForm(forms.ModelForm):
 
         return cleaned
 
+        def clean(self):
+            cleaned_data = super().clean()
+
+            raise forms.ValidationError("Error de prueba global")
+
+            return cleaned_data
+
 
 class MarcarPagadoForm(forms.Form):
     fecha_devolucion = forms.DateField(
