@@ -439,6 +439,49 @@ class PeliculaListView(VistaPrivadaMixin, ListView):
         ctx["filtro_precio_max"] = self.request.GET.get("precio_max", "")
         return ctx
 
+class ExportarAlquileresCSVView(VistaConPermisoMixin, View):
+    permission_required = "tienda.view_alquiler"
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = 'attachment; filename="alquileres.csv"'
+
+        writer = csv.writer(response)
+        writer.writerow([
+            "cliente",
+            "dni",
+            "pelicula",
+            "categoria",
+            "fecha_alquiler",
+            "fecha_devolucion",
+            "fecha_pago",
+            "estado",
+            "precio",
+            "metodo_pago",
+        ])
+
+        alquileres = (
+            Alquiler.objects
+            .select_related("cliente", "pelicula", "pelicula__categoria", "metodo_pago")
+            .order_by("-fecha_alquiler")
+        )
+
+        for alquiler in alquileres:
+            writer.writerow([
+                alquiler.cliente.nombre,
+                alquiler.cliente.dni,
+                alquiler.pelicula.titulo,
+                alquiler.pelicula.categoria.nombre if alquiler.pelicula and alquiler.pelicula.categoria else "",
+                alquiler.fecha_alquiler,
+                alquiler.fecha_devolucion or "",
+                alquiler.fecha_pago or "",
+                alquiler.estado,
+                alquiler.precio,
+                alquiler.metodo_pago.nombre if alquiler.metodo_pago else "",
+            ])
+
+        return response        
+
 class TopPeliculasView(VistaPrivadaMixin, ListView):
     model = Pelicula
     template_name = "tienda/top_peliculas.html"
