@@ -30,9 +30,32 @@ from .models import Pelicula
 
 
 class PeliculaForm(forms.ModelForm):
+    titulo = forms.CharField(
+        error_messages={"required": "El título no puede estar vacío."}
+    )
+
     class Meta:
         model = Pelicula
-        fields = ["titulo", "slug", "descripcion", "anio", "categoria", "precio_alquiler", "stock"]
+        fields = [
+            "titulo",
+            "slug",
+            "descripcion",
+            "director",
+            "pais_origen",
+            "duracion_minutos",
+            "anio",
+            "categoria",
+            "precio_alquiler",
+            "stock",
+        ]
+
+    def clean_titulo(self):
+        titulo = self.cleaned_data["titulo"].strip()
+
+        if not titulo:
+            raise forms.ValidationError("El título no puede estar vacío.")
+
+        return titulo
 
     def clean_slug(self):
         slug = self.cleaned_data["slug"]
@@ -55,8 +78,7 @@ class PeliculaForm(forms.ModelForm):
         if anio > anio_actual:
             raise forms.ValidationError("El año no puede ser mayor al actual.")
 
-        return anio    
-
+        return anio
 
 class AlquilerCreateForm(forms.ModelForm):
     class Meta:
