@@ -549,3 +549,30 @@ Ventaja:
 
 Evita consultas repetidas por cada cliente.
 Mejora rendimiento en listados.
+
+---
+
+## 📌 Entrega del alumno
+
+Alumno: Emérita Chimboras Sandi  
+Código: 1616806  
+Token: 8D86EF6F17C2  
+
+---
+
+## 📊 Retos desarrollados
+
+Se han completado los siguientes retos:
+
+2, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 26, 27, 28, 29, 30, 32, 47, 50, 60, 69, 71, 82, 86, 89
+
+---
+
+## 🧠 Reto 20 — Optimización ORM
+
+Se implementaron mejoras para evitar el problema N+1 en consultas:
+
+```python
+Pelicula.objects.select_related("categoria").prefetch_related("alquileres")
+Alquiler.objects.select_related("cliente", "pelicula", "pelicula__categoria")
+Cliente.objects.prefetch_related("alquileres")
