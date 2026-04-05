@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load soles %}
+
+{% block title %}Detalle de película{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap;">
+        <h2 style="margin: 0;">Detalle de película</h2>
+        <a class="btn secondary" href="{% url 'pelicula_list' %}">Volver</a>
+    </div>
+
+    <div style="margin-top: 16px;">
+        <p><strong>Título:</strong> {{ pelicula.titulo }}</p>
+        <p><strong>Director:</strong> {{ pelicula.director|default:"-" }}</p>
+        <p><strong>País:</strong> {{ pelicula.pais_origen|default:"-" }}</p>
+        <p><strong>Categoría:</strong> {{ pelicula.categoria.nombre }}</p>
+        <p><strong>Año:</strong> {{ pelicula.anio }}</p>
+        <p><strong>Duración:</strong> {{ pelicula.duracion_minutos }} min</p>
+        <p><strong>Precio:</strong> {{ pelicula.precio_alquiler|soles }}</p>
+        <p><strong>Stock:</strong> {{ pelicula.stock }}</p>
+    </div>
+</div>
+
+<div class="row" style="margin-top: 16px;">
+    <div class="card">
+        <strong>Total alquileres</strong>
+        <div style="font-size: 24px; margin-top: 8px;">{{ pelicula.total_alquileres }}</div>
+    </div>
+
+    <div class="card">
+        <strong>Total pagados</strong>
+        <div style="font-size: 24px; margin-top: 8px;">{{ pelicula.total_pagados }}</div>
+    </div>
+
+    <div class="card">
+        <strong>Ingresos generados</strong>
+        <div style="font-size: 24px; margin-top: 8px;">{{ pelicula.ingresos_generados|default:0|soles }}</div>
+    </div>
+</div>
+
+<div class="card" style="margin-top: 16px;">
+    <h3 style="margin-top: 0;">Historial de alquileres</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha alquiler</th>
+                <th>Cliente</th>
+                <th>Estado</th>
+                <th>Precio</th>
+                <th>Método pago</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for alquiler in pelicula.alquileres.all %}
+            <tr>
+                <td>{{ alquiler.fecha_alquiler }}</td>
+                <td>{{ alquiler.cliente.nombre }}</td>
+                <td>{{ alquiler.estado }}</td>
+                <td>{{ alquiler.precio|soles }}</td>
+                <td>{{ alquiler.metodo_pago.nombre|default:"-" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="help">Esta película no tiene alquileres registrados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

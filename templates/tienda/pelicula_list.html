@@ -82,6 +82,10 @@
                     <td>{{ pelicula.precio_alquiler|soles }}</td>
 
                     <td class="actions">
+                        {% if perms.tienda.view_pelicula %}
+                        <a class="btn" href="{% url 'pelicula_detail' pelicula.pk %}">Ver</a>
+                        {% endif %}
+
                         {% if perms.tienda.change_pelicula %}
                         <a class="btn secondary" href="{% url 'pelicula_update' pelicula.pk %}">Editar</a>
                         {% endif %}

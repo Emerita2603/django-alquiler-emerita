@@ -5,7 +5,7 @@ import random
 
 from django.contrib import messages
 from django.db import transaction
-from django.db.models import Avg, Count, F, Sum
+from django.db.models import Avg, Count, F, Q, Sum
 from django.db.models.deletion import ProtectedError
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -552,6 +552,23 @@ class PeliculaDeleteView(VistaConPermisoMixin, DeleteView):
         except ProtectedError:
             messages.error(request, "No puedes eliminar esta película porque tiene alquileres asociados.")
             return redirect("pelicula_list")
+
+class PeliculaDetailView(VistaPrivadaMixin, DetailView):
+    model = Pelicula
+    template_name = "tienda/pelicula_detail.html"
+    context_object_name = "pelicula"
+
+    def get_queryset(self):
+        return (
+            Pelicula.objects
+            .select_related("categoria")
+            .prefetch_related("alquileres__cliente", "alquileres__metodo_pago")
+            .annotate(
+                total_alquileres=Count("alquileres"),
+                total_pagados=Count("alquileres", filter=Q(alquileres__estado="pagado")),
+                ingresos_generados=Sum("alquileres__precio", filter=Q(alquileres__estado="pagado")),
+            )
+        )            
 
 
 class AlquilerCreateView(VistaConPermisoMixin, CreateView):

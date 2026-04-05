@@ -34,6 +34,7 @@ urlpatterns = [
     path("clientes/exportar/", views.ExportarClientesCSVView.as_view(), name="cliente_exportar"),
     path("peliculas/exportar/", views.ExportarPeliculasCSVView.as_view(), name="pelicula_exportar"),
     path("alquileres/exportar/", views.ExportarAlquileresCSVView.as_view(), name="alquiler_exportar"),
+    path("peliculas/<int:pk>/", views.PeliculaDetailView.as_view(), name="pelicula_detail"),
     path("clientes/<int:pk>/", views.ClienteDetailView.as_view(), name="cliente_detail"),
     # Ventas (en esta versión: alquileres pagados)
     path("ventas/", views.VentasListView.as_view(), name="ventas_list"),
