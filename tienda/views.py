@@ -227,6 +227,25 @@ class TopPeliculasView(VistaPrivadaMixin, ListView):
             .order_by("-total_alquileres", "titulo")[:10]
         )
 
+
+class IngresosPorCategoriaView(VistaPrivadaMixin, View):
+    template_name = "tienda/ingresos_por_categoria.html"
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        datos = (
+            Alquiler.objects
+            .filter(estado="pagado")
+            .values("pelicula__categoria__nombre")
+            .annotate(total_ingresos=Sum("precio"))
+            .order_by("-total_ingresos")
+        )
+
+        return render(
+            request,
+            self.template_name,
+            {"datos": datos},
+        )
+
 class PeliculaCreateView(VistaConPermisoMixin, CreateView):
     permission_required = "tienda.add_pelicula"
     model = Pelicula

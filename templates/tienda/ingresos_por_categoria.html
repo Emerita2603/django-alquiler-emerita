@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% load soles %}
+
+{% block title %}Ingresos por categoría{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="margin-top: 0;">Ingresos por categoría</h2>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Categoría</th>
+                <th>Total ingresos</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in datos %}
+            <tr>
+                <td>{{ item.pelicula__categoria__nombre }}</td>
+                <td>{{ item.total_ingresos|soles }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="2" class="help">No hay ingresos registrados por categoría.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

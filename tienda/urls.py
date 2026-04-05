@@ -24,7 +24,8 @@ urlpatterns = [
     path("alquileres/", views.AlquilerListView.as_view(), name="alquiler_list"),
     path("alquileres/nuevo/", views.AlquilerCreateView.as_view(), name="alquiler_create"),
     path("alquileres/<int:pk>/marcar-pagado/", views.MarcarPagadoView.as_view(), name="alquiler_marcar_pagado"),
-    path("reportes/top-peliculas/", views.TopPeliculasView.as_view(), name="top_peliculas"),    
+    path("reportes/top-peliculas/", views.TopPeliculasView.as_view(), name="top_peliculas"),
+    path("reportes/ingresos-por-categoria/", views.IngresosPorCategoriaView.as_view(), name="ingresos_por_categoria"),    
     # Ventas (en esta versión: alquileres pagados)
     path("ventas/", views.VentasListView.as_view(), name="ventas_list"),
     path("ventas/simular/", views.simular_ventas, name="ventas_simular"),
