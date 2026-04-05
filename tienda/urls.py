@@ -28,6 +28,7 @@ urlpatterns = [
     path("reportes/ingresos-por-categoria/", views.IngresosPorCategoriaView.as_view(), name="ingresos_por_categoria"),  
     path("reportes/clientes-sin-alquiler/", views.ClientesSinAlquilerView.as_view(), name="clientes_sin_alquiler"),  
     path("reportes/ticket-promedio/", views.TicketPromedioView.as_view(), name="ticket_promedio"),
+    path("reportes/alquileres-vencidos/", views.AlquileresVencidosView.as_view(), name="alquileres_vencidos"),
     # Ventas (en esta versión: alquileres pagados)
     path("ventas/", views.VentasListView.as_view(), name="ventas_list"),
     path("ventas/simular/", views.simular_ventas, name="ventas_simular"),

@@ -149,6 +149,19 @@ class TicketPromedioView(VistaPrivadaMixin, View):
             {"promedio": promedio},
         )
 
+class AlquileresVencidosView(VistaPrivadaMixin, ListView):
+    model = Alquiler
+    template_name = "tienda/alquileres_vencidos.html"
+    context_object_name = "alquileres"
+
+    def get_queryset(self):
+        return (
+            Alquiler.objects
+            .filter(estado="pendiente", fecha_alquiler__lt=timezone.localdate())
+            .select_related("cliente", "pelicula", "pelicula__categoria")
+            .order_by("fecha_alquiler")
+        )
+
 class ImportarClientesCSVView(VistaConPermisoMixin, View):
     permission_required = "tienda.add_cliente"
     template_name = "tienda/importar_clientes.html"
