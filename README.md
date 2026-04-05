@@ -576,3 +576,29 @@ Se implementaron mejoras para evitar el problema N+1 en consultas:
 Pelicula.objects.select_related("categoria").prefetch_related("alquileres")
 Alquiler.objects.select_related("cliente", "pelicula", "pelicula__categoria")
 Cliente.objects.prefetch_related("alquileres")
+
+---
+
+## 📌 Avance del proyecto (Retos 31–35)
+
+✔ 31 — Exportar películas a CSV
+✔ 33 — Exportar alquileres a CSV
+✔ 34 — DetailView de cliente con historial
+✔ 35 — DetailView de película con métricas
+
+---
+
+## 📊 Total de retos completados
+
+2, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 47, 50, 60, 69, 71, 82, 86, 89
+
+---
+
+## 🚀 Estado
+
+Proyecto avanzado con:
+
+* exportaciones CSV
+* filtros
+* validaciones
+* detail views con métricas
