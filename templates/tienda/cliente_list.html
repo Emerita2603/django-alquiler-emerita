@@ -38,6 +38,10 @@
                     <td>{{ cliente.email|default_if_none:"" }}</td>
                     <td>{{ cliente.telefono|default_if_none:"" }}</td>
                     <td class="actions">
+                        {% if perms.tienda.view_cliente %}
+                        <a class="btn" href="{% url 'cliente_detail' cliente.pk %}">Ver</a>
+                        {% endif %}
+
                         {% if perms.tienda.change_cliente %}
                         <a class="btn secondary" href="{% url 'cliente_update' cliente.pk %}">Editar</a>
                         {% endif %}

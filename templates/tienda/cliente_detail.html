@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load soles %}
+
+{% block title %}Detalle de cliente{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap;">
+        <h2 style="margin: 0;">Detalle de cliente</h2>
+        <a class="btn secondary" href="{% url 'cliente_list' %}">Volver</a>
+    </div>
+
+    <div style="margin-top: 16px;">
+        <p><strong>DNI:</strong> {{ cliente.dni }}</p>
+        <p><strong>Nombre:</strong> {{ cliente.nombre }}</p>
+        <p><strong>Email:</strong> {{ cliente.email|default:"-" }}</p>
+        <p><strong>Teléfono:</strong> {{ cliente.telefono|default:"-" }}</p>
+    </div>
+</div>
+
+<div class="card">
+    <h3 style="margin-top: 0;">Historial de alquileres</h3>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Fecha alquiler</th>
+                <th>Película</th>
+                <th>Categoría</th>
+                <th>Estado</th>
+                <th>Precio</th>
+                <th>Método pago</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for alquiler in cliente.alquileres.all %}
+            <tr>
+                <td>{{ alquiler.fecha_alquiler }}</td>
+                <td>{{ alquiler.pelicula.titulo }}</td>
+                <td>{{ alquiler.pelicula.categoria.nombre }}</td>
+                <td>{{ alquiler.estado }}</td>
+                <td>{{ alquiler.precio|soles }}</td>
+                <td>{{ alquiler.metodo_pago.nombre|default:"-" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="help">Este cliente no tiene alquileres registrados.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

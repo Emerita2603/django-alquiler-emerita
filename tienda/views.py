@@ -12,7 +12,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.utils import timezone
 from django.views import View
-from django.views.generic import CreateView, DeleteView, ListView, UpdateView
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from .forms import (
     AlquilerCreateForm,
@@ -120,6 +120,16 @@ class ClienteDeleteView(VistaConPermisoMixin, DeleteView):
     template_name = "tienda/cliente_confirm_delete.html"
     success_url = reverse_lazy("cliente_list")
 
+class ClienteDetailView(VistaPrivadaMixin, DetailView):
+    model = Cliente
+    template_name = "tienda/cliente_detail.html"
+    context_object_name = "cliente"
+
+    def get_queryset(self):
+        return (
+            Cliente.objects
+            .prefetch_related("alquileres__pelicula", "alquileres__pelicula__categoria", "alquileres__metodo_pago")
+        )
 
 class ClientesSinAlquilerView(VistaPrivadaMixin, ListView):
     model = Cliente
