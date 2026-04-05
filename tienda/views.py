@@ -5,7 +5,7 @@ import random
 
 from django.contrib import messages
 from django.db import transaction
-from django.db.models import Count, F, Sum
+from django.db.models import Avg, Count, F, Sum
 from django.db.models.deletion import ProtectedError
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -132,6 +132,22 @@ class ClientesSinAlquilerView(VistaPrivadaMixin, ListView):
             .order_by("nombre")
         )    
 
+class TicketPromedioView(VistaPrivadaMixin, View):
+    template_name = "tienda/ticket_promedio.html"
+
+    def get(self, request: HttpRequest) -> HttpResponse:
+        promedio = (
+            Alquiler.objects
+            .filter(estado="pagado")
+            .aggregate(ticket_promedio=Avg("precio"))
+            .get("ticket_promedio")
+        )
+
+        return render(
+            request,
+            self.template_name,
+            {"promedio": promedio},
+        )
 
 class ImportarClientesCSVView(VistaConPermisoMixin, View):
     permission_required = "tienda.add_cliente"
@@ -448,3 +464,5 @@ def simular_ventas(request: HttpRequest) -> HttpResponse:
         )
 
     return render(request, "tienda/simular_ventas.html", {"form": form})
+
+    

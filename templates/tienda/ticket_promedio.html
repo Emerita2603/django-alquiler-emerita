@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% load soles %}
+
+{% block title %}Ticket promedio{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2 style="margin-top: 0;">Ticket promedio de alquileres pagados</h2>
+
+    {% if promedio %}
+        <p style="font-size: 20px; font-weight: bold;">
+            {{ promedio|soles }}
+        </p>
+    {% else %}
+        <p class="help">No hay alquileres pagados para calcular el promedio.</p>
+    {% endif %}
+</div>
+{% endblock %}
